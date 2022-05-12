@@ -9,10 +9,10 @@ import {
     OrderType,
     SellOrderParams,
     WalletInfo
-} from '../../index'
+} from "web3-wallets"
 
 import {OpenseaEx} from "./openseaEx";
-import {ExAgent} from "../types/agentTypes";
+import {ExAgent} from "web3-wallets";
 
 
 export class OpenseaExAgent extends EventEmitter implements ExAgent {

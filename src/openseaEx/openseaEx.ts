@@ -4,12 +4,22 @@ import EventEmitter from 'events'
 
 import {
     OPENSEA_CONTRACTS_ADDRESSES,
-    OpenseaABI, RPC_PROVIDER
-} from '../contracts/config'
+    OpenseaABI,
+} from '../contracts/index'
 
-import {ethSend, getEstimateGas, WalletInfo} from 'web3-wallets'
-import {BigNumber, Token, ElementConfig, OrderType} from "../types/elementTypes";
-import {UserAccount} from "../userAccount";
+import {
+    ethSend,
+    getEstimateGas,
+    WalletInfo,
+    UserAccount,
+    BigNumber,
+    Token,
+    ElementConfig,
+    OrderType,
+    RPC_PUB_PROVIDER
+} from 'web3-wallets'
+
+
 import {Contract, ethers} from "ethers";
 import {Order, OrderJSON, UnhashedOrder} from "./types";
 import {
@@ -27,7 +37,7 @@ import {
     LimitedCallSpec,
     MatchParams,
     SellOrderParams
-} from "../../index";
+} from "web3-wallets";
 import {metadataToAsset, getWyvOrderParams} from "./utils/helper";
 import {DEFAULT_EXPIRATION_TIME, DEFAULT_LISTING_TIME, DEFAULT_SELLER_FEE_BASIS_POINTS} from "./utils/constants";
 
@@ -100,6 +110,7 @@ function getEIP712TypedData(orderStr: string, eip712Domain: any, nonce: number) 
     }
 }
 
+const RPC_PROVIDER = RPC_PUB_PROVIDER
 
 export class OpenseaEx extends EventEmitter {
     public walletInfo: WalletInfo
@@ -149,7 +160,6 @@ export class OpenseaEx extends EventEmitter {
             throw  chainId + 'Opensea sdk undefine contracts address'
         }
         const merkleProofAddr = contracts.MerkleProof
-        const exchangeHelperAddr = contracts.WyvernExchange.toLowerCase()
         const exchangeAddr = contracts.WyvernExchange.toLowerCase()
         const proxyRegistryAddr = contracts.WyvernProxyRegistry.toLowerCase()
         const tokenTransferProxyAddr = contracts.WyvernTokenTransferProxy.toString()
@@ -171,10 +181,10 @@ export class OpenseaEx extends EventEmitter {
         this.userAccount = new UserAccount(wallet)
         const options = this.userAccount.signer
         if (exchangeAddr && proxyRegistryAddr) {
-
             this.exchangeProxyRegistry = new ethers.Contract(proxyRegistryAddr, OpenseaABI.proxyRegistry.abi, options)
             this.exchange = new ethers.Contract(exchangeAddr, OpenseaABI.openseaExV2.abi, options)
             this.merkleValidator = new ethers.Contract(merkleProofAddr, OpenseaABI.merkleValidator.abi, options)
+
 
         } else {
             throw new Error(`${this.walletInfo.chainId}  abi undefined`)
@@ -367,6 +377,7 @@ export class OpenseaEx extends EventEmitter {
         if (!assetApprove.isApprove) {
             const tx = await ethSend(this.walletInfo, assetApprove.calldata)
             await tx.wait()
+            console.log(tx.hash)
         }
 
         if (paymentToken.address != NULL_ADDRESS && !tokenApprove.isApprove) {
@@ -508,6 +519,7 @@ export class OpenseaEx extends EventEmitter {
     }
 
     public async checkMatchOrder(orderStr: string) {
+        console.log(111)
         const {orderParm, orderJson} = getWyvOrderParams(orderStr)
         const orderHash = await this.exchange.hashToSign_(...orderParm)
         // 检查订单是否被批量取消-

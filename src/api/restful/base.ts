@@ -1,7 +1,7 @@
-// import unfetch from 'isomorphic-unfetch'
+
 import * as QueryString from "querystring";
 
-import {ElementConfig} from "../../types/elementTypes";
+import {ElementConfig} from "web3-wallets";
 
 export class Fetch {
     /**
@@ -100,7 +100,7 @@ export class Fetch {
      * @param apiPath Path to URL endpoint under API
      * @param opts RequestInit opts, similar to Fetch API
      */
-    private async _fetch(apiPath: string, opts: RequestInit = {}) {
+    public async _fetch(apiPath: string, opts: RequestInit = {}) {
         const apiBase = this.apiBaseUrl
         const token = this.authToken
         const finalUrl1 = `${apiBase}${apiPath}`

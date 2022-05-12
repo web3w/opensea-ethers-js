@@ -1,10 +1,8 @@
-import {SellOrderParams} from "../../../src/types/agentTypes";
+import {SellOrderParams} from "web3-wallets";
 
 import * as secrets from '../../../../secrets.json'
-import {OpenseaAPI} from "../../../src/api/opensea";
-import {MakeOrderType, MakeOrderParams, OrderType} from "../../../src/types/elementTypes";
+import {OpenseaAPI, OrderQueryParams} from "../../../src/api/opensea";
 
-import {OrderQueryParams} from "../../../src/api/restful/ordersApi";
 import {OpenseaEx} from "../../../src/openseaEx/openseaEx";
 
 
@@ -31,10 +29,10 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 
             const openseaApi = new OpenseaAPI({chainId, address: seller})
 
-            const query: OrderQueryParams = {
+            const query = {
                 assetContractAddress: sellAsset.tokenAddress, //
                 tokenId: sellAsset.tokenId
-            }
+            } as OrderQueryParams
             const order = await openseaApi.getOrders(query)
 
             console.log(order)

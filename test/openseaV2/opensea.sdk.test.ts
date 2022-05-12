@@ -1,10 +1,7 @@
-import {SellOrderParams} from "../../src/types/agentTypes";
-
 import * as secrets from '../../../secrets.json'
-import {  Asset} from "../../src/types/elementTypes";
 import {assetToMetadata} from "../../src/openseaEx/utils/helper";
 import {OpenseaEx} from "../../src/openseaEx/openseaEx";
-import {UserAccount} from "../../src/userAccount";
+import {UserAccount, Asset, SellOrderParams} from "web3-wallets";
 
 
 const buyer = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
@@ -27,7 +24,7 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
                 priKey: secrets.accounts[buyer]
             })
             const sellAsset = {
-                tokenId: '573860',//203089
+                tokenId: '203089',//
                 tokenAddress: '0x5fecbbbaf9f3126043a48a35eb2eb8667d469d53',
                 schemaName: 'ERC721'
             } as Asset;

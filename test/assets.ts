@@ -1,4 +1,4 @@
-import {ElementSchemaName} from "../index";
+import {ElementSchemaName} from "web3-wallets";
 
 export const CryptoKitties = {
     4: [{

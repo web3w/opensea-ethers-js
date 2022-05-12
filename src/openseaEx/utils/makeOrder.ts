@@ -10,13 +10,12 @@ import {
     UnhashedOrder,
     UnsignedOrder,
     Token,
-    BigNumber, ElementAsset,
+    BigNumber,
 } from '../types'
 
 import {ElementError} from './error'
 import {_getBuyFeeParameters, _getSellFeeParameters, computeFees} from './fees'
 import {
-
     MAX_DIGITS_IN_UNSIGNED_256_INT,
     MIN_EXPIRATION_SECONDS,
     NULL_ADDRESS,
@@ -24,19 +23,20 @@ import {
     STATIC_EXTRADATA
 } from './constants'
 import {makeBigNumber, toBaseUnitAmount} from './helper'
-import {OrderType} from "../../types/elementTypes";
+import {OrderType, OfferType} from "web3-wallets";
+import {MetaAsset} from "web3-wallets/lib/src/agentTypes";
 
-export enum OfferType {
-    ItemOffer = 'item_offer',
-    ContractOffer = 'contract_offer'
-}
+// export enum OfferType {
+//     ItemOffer = 'item_offer',
+//     ContractOffer = 'contract_offer'
+// }
 
 export function generatePseudoRandomSalt() {
     return new BigNumber(new Date().getTime())
 }
 
 
-export function getElementAsset(asset: Asset, quantity: string = "1"): ElementAsset {
+export function getElementAsset(asset: Asset, quantity: string = "1"): MetaAsset {
     const tokenId = asset.tokenId != undefined ? asset.tokenId.toString() : undefined
 
     const assetFromFields = (fields) => ({

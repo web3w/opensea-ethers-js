@@ -1,19 +1,80 @@
+// import {
+//     ElementAsset,
+// } from "../types/elementTypes"
+
+
+/**
+ * Annotated collection with OpenSea metadata
+ */
+// export interface ElementCollection extends ElementFees {
+//     // Name of the collection
+//     name: string
+//     // Description of the collection
+//     description: string
+//     // Image for the collection
+//     imageUrl: string
+//     // The per-transfer fee, in base units, for this asset in its transfer method
+//     transferFee: BigNumber | string | null
+//     transferFeeAddress?: string
+//     // The transfer fee token for this asset in its transfer method
+//     transferFeePaymentToken: ElemetnFungibleToken | null
+// }
+
+
 import {
     Asset,
     Token,
     OfferType,
     ElementSchemaName,
     ExchangeMetadata,
-    ElementAsset,
-    ElementFees,
-    ElemetnFungibleToken,
-    BigNumber
-} from "../types/elementTypes"
+    BigNumber,
 
-import {Network} from "../types/elementTypes";
+} from "web3-wallets"
+
+
+
+export enum Network {
+    Local = 'private',
+    Main = 'main',
+    Ropsten = 'ropsten',
+    Rinkeby = 'rinkeby',
+    Kovan = 'kovan',
+    Polygon = 'polygon',
+    Mumbai = 'mumbai',
+    BSCTEST = 'bsc_test',
+    BSC = 'bsc',
+    Avalanche = 'avax',
+    AvaxTest = 'avax_test',
+    Fantom = 'fantom',
+    Celo = 'celo',
+    Optimism = 'optimism',
+}
+
+/**
+ * Full annotated Fungible Token spec with OpenSea metadata
+ */
+export interface ElemetnFungibleToken extends Token {
+    imageUrl?: string
+    ethPrice?: string
+    usdPrice?: string
+}
+
+/**
+ * The basis point values of each type of fee
+ */
+export interface ElementFees {
+    // Fee for Element levied on sellers
+    elementSellerFeeBasisPoints: number
+    // Fee for Element levied on buyers
+    elementBuyerFeeBasisPoints: number
+    // Fee for the collection owner levied on sellers
+    devSellerFeeBasisPoints: number
+    // Fee for the collection owner levied on buyers
+    devBuyerFeeBasisPoints: number
+}
 
 export {ElementSchemaName, BigNumber}
-export type {Asset, Token, Network, ExchangeMetadata, ElementAsset}
+export type {Asset, Token, ExchangeMetadata}
 
 export const NULL_BLOCK_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000'
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -236,7 +297,6 @@ export interface ComputedFees extends ElementFees {
     // Comes out of OpenSea fees
     sellerBountyBasisPoints: number
 }
-
 
 
 export interface UnsignedOrder extends UnhashedOrder {

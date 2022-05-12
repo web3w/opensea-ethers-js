@@ -1,13 +1,26 @@
-
-import BigNumber from "bignumber.js";
 import {Fetch} from "./restful/base";
-import {ElementConfig, OrderQueryParams, WalletInfo} from "../types/elementTypes";
-import {NULL_ADDRESS, Order} from "../openseaEx/types";
+import {ElementConfig, OrderType, WalletInfo} from "web3-wallets";
 import {orderToJSON} from "../openseaEx/utils/makeOrder";
 import {openseaOrderFromJSON} from "../openseaEx/utils/helper";
-// import {OrderJSON} from "../openseaEx/types";
+import QueryString from "querystring";
+import * as http from "http";
 
 
+export interface ChainInfo {
+    chain?: string
+    chainId?: string
+}
+
+export interface OrderQueryParams extends ChainInfo {
+    assetContractAddress: string //
+    tokenId: string
+    orderType: OrderType
+}
+
+export interface AssetQueryParams {
+    asset_contract_addresses: string
+    token_ids: string
+}
 
 const ORDERBOOK_VERSION = 1
 const ORDERBOOK_PATH = `/wyvern/v${ORDERBOOK_VERSION}`
@@ -37,6 +50,58 @@ export class OpenseaAPI extends Fetch {
             this.apiBaseUrl = apiConfig[wallet.chainId].apiBaseUrl
             this.apiKey = apiConfig[wallet.chainId].apiKey
         }
+    }
+
+    public async getAssets(owner: string, queryParams: AssetQueryParams[]): Promise<any> {
+
+        const list = queryParams.map((val: any) => {
+            return QueryString.stringify(val)
+        })
+        const assetList = list.join('&')
+        const other = {
+            include_orders: true,
+            owner,
+            limit: 50
+        }
+        // const qs = QueryString.stringify(other) + '&' + assetList
+
+        const url = `${this.apiBaseUrl}/v1/assets?${QueryString.stringify(other)}&${assetList}`
+
+        const options = new URL(url)
+        console.log(options)
+
+        return new Promise(resolve => {
+            http.get(options, function (http_res) {
+                // initialize the container for our data
+                var data = "";
+
+                // this event fires many times, each time collecting another piece of the response
+                http_res.on("data", function (chunk) {
+                    // append this chunk to our growing `data` var
+                    data += chunk;
+
+                });
+
+                // this event fires *one* time, after all the `data` events/chunks have been gathered
+                http_res.on("end", function () {
+                    // you can use res.send instead of console.log to output via express
+                    console.log(data);
+                    resolve(data)
+                });
+            });
+        })
+
+
+        // const options = {
+        //     protocol:'https:',
+        //     host: 'localhost',
+        //     port:3000,
+        //     path: '/iso/country/Japan',
+        //     method:'GET'
+        // };
+        // const response = await this._fetch(url,options)
+        // return response.json()
+        // include_orders=true&owner=0x7db3E3f10faD9DB3a2DA202Ddfe62e6A05b86087&limit=50
     }
 
     public async getOrders(queryParams: OrderQueryParams): Promise<any> {
