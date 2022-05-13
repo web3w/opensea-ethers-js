@@ -2,10 +2,9 @@ import {
     Asset,
     ElementSchemaName,
     HowToCall,
-    Network,
+
     Order,
     OrderJSON,
-    OrderSide,
     SaleKind,
     UnhashedOrder,
     UnsignedOrder,
@@ -23,7 +22,7 @@ import {
     STATIC_EXTRADATA
 } from './constants'
 import {makeBigNumber, toBaseUnitAmount} from './helper'
-import {OrderType, OfferType} from "web3-wallets";
+import {OfferType, OrderType} from "web3-wallets";
 import {MetaAsset} from "web3-wallets/lib/src/agentTypes";
 
 // export enum OfferType {
@@ -66,7 +65,7 @@ export function getSchemaAndAsset(asset: Asset, quantity: number) {
 }
 
 export function getPriceParameters(
-    orderSide: OrderSide,
+    orderSide: OrderType,
     paymentTokenObj: Token,
     expirationTime: number,
     startAmount: number,
@@ -213,7 +212,7 @@ export async function _makeBuyOrder({
     // const {target, dataToCall, replacementPattern} = encodeBuy(metadata, accountAddress, offerType)
 
     const {basePrice, extra, paymentToken} = getPriceParameters(
-        OrderSide.Buy,
+        OrderType.Buy,
         paymentTokenObj,
         expirationTime,
         startAmount
@@ -224,7 +223,7 @@ export async function _makeBuyOrder({
     const {totalBuyerFeeBasisPoints, totalSellerFeeBasisPoints} = await computeFees({
         asset: asset,
         extraBountyBasisPoints,
-        side: OrderSide.Buy
+        side: OrderType.Buy
     })
 
     // OrderSide.Buy
@@ -321,7 +320,7 @@ export async function _makeSellOrder({
         endAmount !== undefined && endAmount !== startAmount ? SaleKind.DutchAuction : SaleKind.FixedPrice
 
     const {basePrice, extra, paymentToken, reservePrice} = getPriceParameters(
-        OrderSide.Sell,
+        OrderType.Sell,
         paymentTokenObj,
         expirationTime,
         startAmount,
@@ -335,7 +334,7 @@ export async function _makeSellOrder({
     const isPrivate = buyerAddress != NULL_ADDRESS
     const {totalSellerFeeBasisPoints, totalBuyerFeeBasisPoints, sellerBountyBasisPoints} = await computeFees({
         asset,
-        side: OrderSide.Sell,
+        side: OrderType.Sell,
         isPrivate,
         extraBountyBasisPoints
     })

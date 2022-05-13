@@ -42,7 +42,7 @@ export function MainLayout() {
         // setDrawerVisible(true);
         const rpcUrl = "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
         // const tokenBal = await sdk.getUserTokenBalance({tokenAddr: NULL_ADDRESS, decimals: 18, rpcUrl})
-        const bal = await eleSDK.getUserTokenBalance({
+        const bal = await wallet.userAccount.getUserTokenBalance({
             tokenAddr: "0x44C73A7b3B286c78944aD79b2BBa0204916Cebca",
             decimals: 18,
             account: "0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401"

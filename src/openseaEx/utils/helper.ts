@@ -42,6 +42,76 @@ export function orderSigEncode(order: ECSignature): Array<any> {
     return orderSigValueArray
 }
 
+
+export function getEIP712TypedData(orderStr: string, eip712Domain: any, nonce: number) {
+    const order: OrderJSON = JSON.parse(orderStr)
+    // EIP712Domain: [
+    //     {name: 'name', type: 'string'},
+    //     {name: 'version', type: 'string'},
+    //     {name: 'chainId', type: 'uint256'},
+    //     {name: 'verifyingContract', type: 'address'}
+    // ],
+    return {
+        types: {
+            Order: [
+                {type: 'address', name: 'exchange'},
+                {type: 'address', name: 'maker'},
+                {type: 'address', name: 'taker'},
+                {type: 'uint256', name: 'makerRelayerFee'},
+                {type: 'uint256', name: 'takerRelayerFee'},
+                {type: 'uint256', name: 'makerProtocolFee'},
+                {type: 'uint256', name: 'takerProtocolFee'},
+                {type: 'address', name: 'feeRecipient'},
+                {type: 'uint8', name: 'feeMethod'},
+                {type: 'uint8', name: 'side'},
+                {type: 'uint8', name: 'saleKind'},
+                {type: 'address', name: 'target'},
+                {type: 'uint8', name: 'howToCall'},
+                {type: 'bytes', name: 'calldata'},
+                {type: 'bytes', name: 'replacementPattern'},
+                {type: 'address', name: 'staticTarget'},
+                {type: 'bytes', name: 'staticExtradata'},
+                {type: 'address', name: 'paymentToken'},
+                {type: 'uint256', name: 'basePrice'},
+                {type: 'uint256', name: 'extra'},
+                {type: 'uint256', name: 'listingTime'},
+                {type: 'uint256', name: 'expirationTime'},
+                {type: 'uint256', name: 'salt'},
+                {type: 'uint256', name: 'nonce'}
+            ]
+        },
+        domain: eip712Domain,
+        primaryType: 'Order',
+        message: {
+            exchange: order.exchange,
+            maker: order.maker,
+            taker: order.taker,
+            makerRelayerFee: order.makerRelayerFee,
+            takerRelayerFee: order.takerRelayerFee,
+            makerProtocolFee: order.makerProtocolFee,
+            takerProtocolFee: order.takerProtocolFee,
+            feeRecipient: order.feeRecipient,
+            feeMethod: Number(order.feeMethod),
+            side: Number(order.side),
+            saleKind: Number(order.saleKind),
+            target: order.target,
+            howToCall: Number(order.howToCall),
+            calldata: order.dataToCall,
+            replacementPattern: order.replacementPattern,
+            staticTarget: order.staticTarget,
+            staticExtradata: order.staticExtradata,
+            paymentToken: order.paymentToken,
+            basePrice: order.basePrice,
+            extra: order.extra,
+            listingTime: order.listingTime,
+            expirationTime: order.expirationTime,
+            salt: order.salt,
+            nonce
+        }
+    }
+}
+
+
 export function getWyvOrderParams(orderStr: string): { orderJson: any, orderParm: Array<any> } {
     const order: OrderJSON = JSON.parse(orderStr)
     const orderParm = [

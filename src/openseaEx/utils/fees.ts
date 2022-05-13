@@ -6,7 +6,7 @@ import {
   DEFAULT_MAX_BOUNTY,
   ELEMENT_SELLER_BOUNTY_BASIS_POINTS
 } from './constants'
-import { Asset, ComputedFees, OrderSide, UnhashedOrder, FeeMethod } from '../types'
+import { Asset, ComputedFees, OrderType, UnhashedOrder, FeeMethod } from '../types'
 
 /**
  * Compute the fees for an order
@@ -25,7 +25,7 @@ export function computeFees({
                               extraBountyBasisPoints = 0
                             }: {
   asset?: Asset
-  side: OrderSide
+  side: OrderType
   accountAddress?: string
   isPrivate?: boolean
   extraBountyBasisPoints?: number
@@ -48,7 +48,7 @@ export function computeFees({
   }
 
   // Compute transferFrom fees
-  if (side == OrderSide.Sell && asset) {
+  if (side == OrderType.Sell && asset) {
     // Server-side knowledge
     transferFee = asset?.collection?.transferFee ? makeBigNumber(asset?.collection?.transferFee.toString() || '0') : transferFee
     transferFeeTokenAddress = asset?.collection?.transferFeePaymentToken
@@ -57,7 +57,7 @@ export function computeFees({
   }
 
   // Compute bounty
-  let sellerBountyBasisPoints = side == OrderSide.Sell ? extraBountyBasisPoints : 0
+  let sellerBountyBasisPoints = side == OrderType.Sell ? extraBountyBasisPoints : 0
 
   // Check that bounty is in range of the element fee
   const bountyTooLarge = sellerBountyBasisPoints + ELEMENT_SELLER_BOUNTY_BASIS_POINTS > maxTotalBountyBPS

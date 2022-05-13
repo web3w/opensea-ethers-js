@@ -1,4 +1,3 @@
-
 import * as QueryString from "querystring";
 
 import {ElementConfig} from "web3-wallets";
@@ -8,20 +7,20 @@ export class Fetch {
      * Page size to use for fetching orders
      */
     public apiBaseUrl: string
-    public authToken: string
+    public apiKey: string
     // public chain: string
     /**
      * Logger function to use when debugging
      */
-    public logger: (arg: string) => void
+    public logger: (arg: string) => void = console.log
 
-    constructor(config: ElementConfig, logger?: (arg: string) => void) {
-        const chainId = config.chainId || 1
+    constructor() {
+
         this.apiBaseUrl = ""
         // this.chain = CHAIN[chainId]
-        this.authToken = ''
+        this.apiKey = ''
         // Debugging: default to nothing
-        this.logger = logger || ((arg: string) => arg)
+        // this.logger = logger || ((arg: string) => arg)
     }
 
     /**
@@ -39,6 +38,15 @@ export class Fetch {
     async get(apiPath, query = {}, opts: RequestInit = {}) {
 
         const qs = QueryString.stringify(query)
+        const url = `${apiPath}?${qs}`
+
+        // return this._fetch(url)
+        const response = await this._fetch(url, opts)
+        return response.json()
+    }
+
+    async getURL(apiPath, qs:string, opts: RequestInit = {}) {
+
         const url = `${apiPath}?${qs}`
 
         // return this._fetch(url)
@@ -102,13 +110,11 @@ export class Fetch {
      */
     public async _fetch(apiPath: string, opts: RequestInit = {}) {
         const apiBase = this.apiBaseUrl
-        const token = this.authToken
         const finalUrl1 = `${apiBase}${apiPath}`
         if (opts) {
             const finalOpts = {
                 ...opts,
                 headers: {
-                    ...(token ? {Authorization: token} : {}),
                     ...(opts.headers || {})
                 }
             }

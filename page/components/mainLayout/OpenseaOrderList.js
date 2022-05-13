@@ -2,7 +2,7 @@ import {Button, Modal, Radio, Space, Table} from "antd";
 import React, {useContext, useEffect, useState} from "react";
 import {Context} from '../AppContext'
 import "./index.css"
-import {ExSchemaName, OrderType, MakeOrderType} from "../../../src/types/elementTypes";
+import {OrderType,} from "web3-wallets";
 
 import {nftOrder} from './config'
 
@@ -49,19 +49,29 @@ export function OpenseaOrderList(props) {
             }
         }
         // paymentToken: sellEx.contracts.ETH,
-        const expirationTime = parseInt((new Date().getTime() / 1000) + (60 * 60 * 24 * 10))
         //['No expiration_time was set, expiration_time must be within 6 months of order creation.']
         const sellParams = {
             asset: sellAsset,
-            startAmount: 0.6,
-            standard: ExSchemaName.OpenseaEx
+            startAmount: 0.6
         }
-        const order = await eleSDK.createOrder(MakeOrderType.FixPriceOrder, sellParams)
+        const order = await eleSDK.createSellOrder(sellParams)
         const orderStr = JSON.stringify(order)
-        const list = await eleSDK.postOpenSeaOrder(orderStr)
+        const list = await eleSDK.openseaApi.postSingedOrder(orderStr)
         console.log(list)
         // setCreateOrderVisible(false)
     }
+
+    const getAssets = async () => {
+        const dataList = asset[chainId]
+        const query =dataList.map(val=>{
+            return {
+                asset_contract_addresses: val.address, //
+                token_ids: val.children[0].name
+            }
+        })
+        const list = await eleSDK.openseaApi.getAssets(account,query)
+        console.log(list)
+    };
 
     useEffect(() => {
         console.log('useEffect')
@@ -92,10 +102,10 @@ export function OpenseaOrderList(props) {
                     const params = {
                         tokenId: name,
                         assetContractAddress: address,
-                        orderType: OrderType.All
+                        orderType: OrderType.Sell
                     }
                     // const list = await eleSDK.openseaApi.getOrders(params)
-                    const infoList =[] //list.inforList
+                    const infoList = [] //list.inforList
                     asset.children = []
                     for (const edge of infoList) {
                         debugger
@@ -129,7 +139,9 @@ export function OpenseaOrderList(props) {
     return (
         <div style={{padding: 24, minHeight: 360}}>
             <Table dataSource={dataSource} columns={columns}/>
-            OpenseaOrderList
+            <Button type="primary" onClick={getAssets}>
+                GetAssets
+            </Button>
             <Modal title="Basic Modal" visible={createOrderVisible}
                    onOk={() => postOrder(false)}
                    onCancel={() => setModal(false)}>

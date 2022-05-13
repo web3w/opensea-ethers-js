@@ -2,7 +2,7 @@ import {Button, Modal, Radio, Space, Table} from "antd";
 import React, {useContext, useEffect, useState} from "react";
 import {Context} from '../AppContext'
 import "./index.css"
-import {ExSchemaName, OrderType} from "../../../src/types/elementTypes";
+import {OrderType} from "web3-wallets";
 
 // const {nftOrder} = require("./config.json")
 import {nftOrder} from './config'
@@ -24,7 +24,7 @@ export function NFTOrderList(props) {
         console.log('showModal', record)
 
         debugger
-        const owner = await eleSDK.userAccount.getERC721OwnerOf(record.assetAddress, record.name)
+        const owner = await wallet.userAccount.getERC721OwnerOf(record.assetAddress, record.name)
         debugger
         record['owner'] = owner
         setSelectOrder(record)
@@ -68,10 +68,10 @@ export function NFTOrderList(props) {
                     const params = {
                         tokenId: name,
                         assetContractAddress: address,
-                        orderType: OrderType.All,
+                        orderType: OrderType.Sell,
                         thirdStandards
                     }
-                    const list = await eleSDK.elementApi.getAssetsDetailPrice(params)
+                    const list = await eleSDK.openseaApi.getOrders(params)
                     asset.children = []
                     for (const edge of list.edges) {
                         const {metadata, quantity, side, listingTime, priceUSD, maker, standard, id} = edge.node

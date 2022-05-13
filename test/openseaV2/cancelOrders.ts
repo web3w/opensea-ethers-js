@@ -1,8 +1,7 @@
 import * as secrets from '../../../secrets.json'
-import {Asset, ExSchemaName, MakeOrderType, Token} from "../../src/types/elementTypes";
-import {LowerPriceOrderParams, SellOrderParams} from "../../src/types/agentTypes";
+import {Asset, LowerPriceOrderParams, SellOrderParams, Token} from "web3-wallets";
+
 import {asset721, erc20Tokens} from "../assets";
-import BigNumber from "bignumber.js";
 import {OpenseaEx} from "../../src/openseaEx/openseaEx";
 
 const rpcUrl = 'https://api-test.element.market/api/v1/jsonrpc'
@@ -26,7 +25,6 @@ const buySDK = new OpenseaEx({
     priKey: secrets.accounts[buyer]
 });
 
-const standard = ExSchemaName.OpenseaEx
 ;(async () => {
         // const tokenBal = await eleSDK.getUserTokenBalance(token.address, token.decimals)
         // console.log(tokenBal)
@@ -34,8 +32,7 @@ const standard = ExSchemaName.OpenseaEx
             const buyParams = {
                 asset,
                 startAmount: Number('0.002'),
-                quantity: 1,
-                standard
+                quantity: 1
             } as SellOrderParams
             const sellData = await eleSDK.createSellOrder(buyParams)
             // const order = {...sellData, version: 0}
@@ -48,8 +45,8 @@ const standard = ExSchemaName.OpenseaEx
             const cancelOrderTx = await eleSDK.cancelOrders([sellOrderStr])
             await cancelOrderTx.wait()
 
-            const order = await eleSDK.postOrder(sellOrderStr, {standard})
-            console.log(order.id || order)
+            // const order = await eleSDK.postOrder(sellOrderStr, {standard})
+            // console.log(order.id || order)
 
             // const lowParams = {
             //     orderStr: sellOrderStr,
@@ -66,16 +63,7 @@ const standard = ExSchemaName.OpenseaEx
 
         } catch (err: any) {
             debugger
-            // console.log(eleSDK.exAgent)
-            // @ts-ignore
-            const ex = await eleSDK.getExAgent(standard)
-            const calldata = await ex.approveOrder(err)
-            const tx = await eleSDK.ethSend(calldata)
-            if (tx) {
-                await tx.wait()
-                console.log(tx.hash)
-            }
-
+            console.log(err)
         }
     }
 )()

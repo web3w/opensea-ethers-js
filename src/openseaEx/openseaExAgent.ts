@@ -13,11 +13,13 @@ import {
 
 import {OpenseaEx} from "./openseaEx";
 import {ExAgent} from "web3-wallets";
+import {OpenseaAPI} from "../api/opensea";
 
 
 export class OpenseaExAgent extends EventEmitter implements ExAgent {
     public contracts: OpenseaEx
     public walletInfo: WalletInfo
+    public openseaApi: OpenseaAPI
 
     constructor(wallet: WalletInfo, config?: ElementConfig) {
         super()
@@ -28,6 +30,7 @@ export class OpenseaExAgent extends EventEmitter implements ExAgent {
         }
         // const {walletProvider} = getProvider(wallet)
         this.contracts = new OpenseaEx(wallet, conf)
+        this.openseaApi = new OpenseaAPI(wallet, conf)
         // this.walletProvider = walletProvider
         this.walletInfo = wallet
     }

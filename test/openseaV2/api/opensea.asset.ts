@@ -5,17 +5,18 @@ import {OpenseaAPI} from "../../../src/api/opensea";
 
 
 const rpcUrl = 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
-// const account2 = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
+const buyer = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
 const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 import * as QueryString from "querystring";
+import * as dns from "dns";
 
 ;(async () => {
+
         const sellAsset = {
             tokenId: '9',
             tokenAddress: '0xb556f251eacbec4badbcddc4a146906f2c095bee',
             schemaName: 'ERC721'
         }
-
 
 
         // console.log(QueryString.(sellAsset))
@@ -31,11 +32,8 @@ import * as QueryString from "querystring";
             const query = [{
                 asset_contract_addresses: sellAsset.tokenAddress, //
                 token_ids: sellAsset.tokenId
-            },{
-                asset_contract_addresses: sellAsset.tokenAddress, //
-                token_ids: sellAsset.tokenId
             }]
-            const order = await openseaApi.getAssets(seller,query)
+            const order = await openseaApi.getAssets(buyer, query)
 
             console.log(order)
 

@@ -1,112 +1,54 @@
-// import {
-//     ElementAsset,
-// } from "../types/elementTypes"
-
-
-/**
- * Annotated collection with OpenSea metadata
- */
-// export interface ElementCollection extends ElementFees {
-//     // Name of the collection
-//     name: string
-//     // Description of the collection
-//     description: string
-//     // Image for the collection
-//     imageUrl: string
-//     // The per-transfer fee, in base units, for this asset in its transfer method
-//     transferFee: BigNumber | string | null
-//     transferFeeAddress?: string
-//     // The transfer fee token for this asset in its transfer method
-//     transferFeePaymentToken: ElemetnFungibleToken | null
-// }
-
-
 import {
     Asset,
     Token,
     OfferType,
     ElementSchemaName,
+    OrderType,
     ExchangeMetadata,
+    NULL_ADDRESS,
     BigNumber,
-
 } from "web3-wallets"
 
 
+export {ElementSchemaName, BigNumber, NULL_ADDRESS, OrderType}
+export type {Asset, Token, ExchangeMetadata}
 
-export enum Network {
-    Local = 'private',
-    Main = 'main',
-    Ropsten = 'ropsten',
-    Rinkeby = 'rinkeby',
-    Kovan = 'kovan',
-    Polygon = 'polygon',
-    Mumbai = 'mumbai',
-    BSCTEST = 'bsc_test',
-    BSC = 'bsc',
-    Avalanche = 'avax',
-    AvaxTest = 'avax_test',
-    Fantom = 'fantom',
-    Celo = 'celo',
-    Optimism = 'optimism',
+export interface ChainInfo {
+    chain?: string
+    chainId?: string
 }
 
+export interface OrderQueryParams extends ChainInfo {
+    assetContractAddress: string //
+    tokenId: string
+    orderType: OrderType
+}
+
+export interface AssetQueryParams {
+    asset_contract_addresses: string
+    token_ids: string
+}
+
+export interface AssetCollection {
+    payout_address?: string //opensea royalty fee address
+    dev_seller_fee_basis_points?: number //open sea royalty fee
+    seller_fee_basis_points?: number //open sea protocol fee
+    address?: string
+    token_id: string
+}
+
+// https://testnets-api.opensea.io/api/v1/assets?include_orders=true&owner=0x9f7a946d935c8efc7a8329c0d894a69ba241345a&limit=50&asset_contract_addresses=0x4cddbf865ee2a1a3711648bb192e285f290f7985&token_ids=4676314080394472507455332797632474230665182066565445726959043747700191264868&asset_contract_addresses=0xb556f251eacbec4badbcddc4a146906f2c095bee&token_ids=2&asset_contract_addresses=0x5fecbbbaf9f3126043a48a35eb2eb8667d469d53&token_ids=719455&asset_contract_addresses=0xb556f251eacbec4badbcddc4a146906f2c095bee&token_ids=3
 /**
  * Full annotated Fungible Token spec with OpenSea metadata
  */
-export interface ElemetnFungibleToken extends Token {
-    imageUrl?: string
-    ethPrice?: string
-    usdPrice?: string
-}
-
-/**
- * The basis point values of each type of fee
- */
-export interface ElementFees {
-    // Fee for Element levied on sellers
-    elementSellerFeeBasisPoints: number
-    // Fee for Element levied on buyers
-    elementBuyerFeeBasisPoints: number
-    // Fee for the collection owner levied on sellers
-    devSellerFeeBasisPoints: number
-    // Fee for the collection owner levied on buyers
-    devBuyerFeeBasisPoints: number
-}
-
-export {ElementSchemaName, BigNumber}
-export type {Asset, Token, ExchangeMetadata}
-
-export const NULL_BLOCK_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000'
-export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
-
-// interface ElementNFTAsset {
-//     id: string
-//     address: string
-//     quantity?: string
-//     data?: string
-//     collection?: ElementCollection
-// }
-//
-// interface ElementFTAsset {
-//     id?: string
-//     address: string
-//     quantity: string
-//     data?: string
-//     collection?: ElementCollection
-// }
-
-// export type ElementAsset = ElementNFTAsset | ElementFTAsset
-
-
-// export interface ExchangeMetadataForAsset {
-//     asset: ElementAsset
-//     schema: ElementSchemaName
-//     version?: number
-//     referrerAddress?: string
+// export interface ElemetnFungibleToken extends Token {
+//     imageUrl?: string
+//     ethPrice?: string
+//     usdPrice?: string
 // }
 
 
-// export type ExchangeMetadata = ExchangeMetadataForAsset
+
 
 //----------- OrderJSON--------------
 export interface ECSignature {
@@ -156,8 +98,7 @@ export interface OrderJSON extends Partial<ECSignature> {
     chainId?: string
 }
 
-
-export interface ElementOrder {
+export interface BaseOrder {
     exchange: string
     maker: string
     taker: string
@@ -188,16 +129,12 @@ export enum FeeMethod {
     SplitFee = 1
 }
 
-export enum OrderSide {
-    Buy = 0,
-    Sell = 1
-}
-
-export enum OrderType {
-    All = -1,
-    Buy = 0,
-    Sell = 1
-}
+//
+// export enum OrderType {
+//     All = -1,
+//     Buy = 0,
+//     Sell = 1
+// }
 
 export enum SaleKind {
     FixedPrice = 0,
@@ -211,7 +148,7 @@ export enum HowToCall {
     Create = 3
 }
 
-export interface UnhashedOrder extends ElementOrder {
+export interface UnhashedOrder extends BaseOrder {
     feeMethod: FeeMethod
     side: OrderType
     saleKind: SaleKind
@@ -232,12 +169,12 @@ export interface UnsignedOrder extends UnhashedOrder {
     nonce?: string | number
 }
 
-export interface ElementUser {
+export interface OpenSeaUser {
     // Username for this user
     username: string
 }
 
-export interface ElementAccount {
+export interface OpenSeaAccount {
     // Wallet address for this account
     address: string
     // Public configuration info, including "affiliate" for users who are in the Element affiliate program
@@ -247,10 +184,10 @@ export interface ElementAccount {
     profileImgUrl: string
 
     // More information explicitly set by this account's owner on Element
-    user: ElementUser | null
+    user: OpenSeaUser | null
 }
 
-export interface ElementFungibleToken extends Token {
+export interface PaymentTokenToken extends Token {
     imageUrl?: string
     ethPrice?: string
     usdPrice?: string
@@ -265,10 +202,10 @@ export interface Order extends UnsignedOrder, Partial<ECSignature> {
     createdTime?: BigNumber
     currentPrice?: BigNumber
     currentBounty?: BigNumber
-    makerAccount?: ElementAccount
-    takerAccount?: ElementAccount
-    feeRecipientAccount?: ElementAccount
-    paymentTokenContract?: ElementFungibleToken
+    makerAccount?: OpenSeaAccount
+    takerAccount?: OpenSeaAccount
+    feeRecipientAccount?: OpenSeaAccount
+    paymentTokenContract?: PaymentTokenToken
     cancelledOrFinalized?: boolean
     markedInvalid?: boolean
     asset?: any
@@ -279,12 +216,24 @@ export interface Order extends UnsignedOrder, Partial<ECSignature> {
 
 
 /******************** Fees ***********************/
-
+/**
+ * The basis point values of each type of fee
+ */
+export interface OpenSeaFees {
+    // Fee for Element levied on sellers
+    elementSellerFeeBasisPoints: number
+    // Fee for Element levied on buyers
+    elementBuyerFeeBasisPoints: number
+    // Fee for the collection owner levied on sellers
+    devSellerFeeBasisPoints: number
+    // Fee for the collection owner levied on buyers
+    devBuyerFeeBasisPoints: number
+}
 
 /**
  * Fully computed fees including bounties and transfer fees
  */
-export interface ComputedFees extends ElementFees {
+export interface ComputedFees extends OpenSeaFees {
     // Total fees. dev + element
     totalBuyerFeeBasisPoints: number
     totalSellerFeeBasisPoints: number

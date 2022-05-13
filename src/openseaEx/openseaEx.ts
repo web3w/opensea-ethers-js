@@ -1,5 +1,3 @@
-import {NULL_ADDRESS, Asset, NULL_BLOCK_HASH, ElementSchemaName} from './types'
-
 import EventEmitter from 'events'
 
 import {
@@ -16,10 +14,15 @@ import {
     Token,
     ElementConfig,
     OrderType,
-    RPC_PUB_PROVIDER
+    RPC_PUB_PROVIDER,
+    NULL_ADDRESS, Asset, NULL_BLOCK_HASH, ElementSchemaName,
+    BuyOrderParams,
+    CreateOrderParams,
+    LimitedCallSpec,
+    MatchParams,
+    SellOrderParams,
+    ETHToken
 } from 'web3-wallets'
-
-
 import {Contract, ethers} from "ethers";
 import {Order, OrderJSON, UnhashedOrder} from "./types";
 import {
@@ -31,84 +34,9 @@ import {
     orderToJSON
 } from "./utils/makeOrder";
 import {ElementError} from "./utils/error";
-import {
-    BuyOrderParams,
-    CreateOrderParams,
-    LimitedCallSpec,
-    MatchParams,
-    SellOrderParams
-} from "web3-wallets";
-import {metadataToAsset, getWyvOrderParams} from "./utils/helper";
+import {metadataToAsset, getWyvOrderParams, getEIP712TypedData} from "./utils/helper";
 import {DEFAULT_EXPIRATION_TIME, DEFAULT_LISTING_TIME, DEFAULT_SELLER_FEE_BASIS_POINTS} from "./utils/constants";
 
-
-function getEIP712TypedData(orderStr: string, eip712Domain: any, nonce: number) {
-    const order: OrderJSON = JSON.parse(orderStr)
-    // EIP712Domain: [
-    //     {name: 'name', type: 'string'},
-    //     {name: 'version', type: 'string'},
-    //     {name: 'chainId', type: 'uint256'},
-    //     {name: 'verifyingContract', type: 'address'}
-    // ],
-    return {
-        types: {
-            Order: [
-                {type: 'address', name: 'exchange'},
-                {type: 'address', name: 'maker'},
-                {type: 'address', name: 'taker'},
-                {type: 'uint256', name: 'makerRelayerFee'},
-                {type: 'uint256', name: 'takerRelayerFee'},
-                {type: 'uint256', name: 'makerProtocolFee'},
-                {type: 'uint256', name: 'takerProtocolFee'},
-                {type: 'address', name: 'feeRecipient'},
-                {type: 'uint8', name: 'feeMethod'},
-                {type: 'uint8', name: 'side'},
-                {type: 'uint8', name: 'saleKind'},
-                {type: 'address', name: 'target'},
-                {type: 'uint8', name: 'howToCall'},
-                {type: 'bytes', name: 'calldata'},
-                {type: 'bytes', name: 'replacementPattern'},
-                {type: 'address', name: 'staticTarget'},
-                {type: 'bytes', name: 'staticExtradata'},
-                {type: 'address', name: 'paymentToken'},
-                {type: 'uint256', name: 'basePrice'},
-                {type: 'uint256', name: 'extra'},
-                {type: 'uint256', name: 'listingTime'},
-                {type: 'uint256', name: 'expirationTime'},
-                {type: 'uint256', name: 'salt'},
-                {type: 'uint256', name: 'nonce'}
-            ]
-        },
-        domain: eip712Domain,
-        primaryType: 'Order',
-        message: {
-            exchange: order.exchange,
-            maker: order.maker,
-            taker: order.taker,
-            makerRelayerFee: order.makerRelayerFee,
-            takerRelayerFee: order.takerRelayerFee,
-            makerProtocolFee: order.makerProtocolFee,
-            takerProtocolFee: order.takerProtocolFee,
-            feeRecipient: order.feeRecipient,
-            feeMethod: Number(order.feeMethod),
-            side: Number(order.side),
-            saleKind: Number(order.saleKind),
-            target: order.target,
-            howToCall: Number(order.howToCall),
-            calldata: order.dataToCall,
-            replacementPattern: order.replacementPattern,
-            staticTarget: order.staticTarget,
-            staticExtradata: order.staticExtradata,
-            paymentToken: order.paymentToken,
-            basePrice: order.basePrice,
-            extra: order.extra,
-            listingTime: order.listingTime,
-            expirationTime: order.expirationTime,
-            salt: order.salt,
-            nonce
-        }
-    }
-}
 
 const RPC_PROVIDER = RPC_PUB_PROVIDER
 
@@ -119,7 +47,7 @@ export class OpenseaEx extends EventEmitter {
     // address
     public contractAddresses: any
     // public WETHAddr: string
-    public elementSharedAsset: string
+    public sharedAsset: string
     public exchangeKeeper: string
     public feeRecipientAddress: string
     public tokenTransferProxyAddress: string
@@ -135,24 +63,16 @@ export class OpenseaEx extends EventEmitter {
     public userAccount: UserAccount
 
     public GasWarpperToken: Token
-    public ETH: Token = {
-        name: 'etherem',
-        symbol: 'ETH',
-        address: NULL_ADDRESS,
-        decimals: 18
-    }
 
     constructor(wallet: WalletInfo, config?: ElementConfig) {
         super()
         const contracts = config?.contractAddresses || OPENSEA_CONTRACTS_ADDRESSES[wallet.chainId]
-        // wallet.exSchema = ExSchemaName.OpenseaEx
         if (config?.protocolFeePoint) {
             this.protocolFeePoint = config.protocolFeePoint
         }
         this.walletInfo = wallet
         this.accountProxyAddress = NULL_ADDRESS
 
-        //
         const chainId = wallet.chainId
         // fee = '0x5b3256965e7C3cF26E11FCAf296DfC8807C01073'
 
@@ -160,10 +80,10 @@ export class OpenseaEx extends EventEmitter {
             throw  chainId + 'Opensea sdk undefine contracts address'
         }
         const merkleProofAddr = contracts.MerkleProof
-        const exchangeAddr = contracts.WyvernExchange.toLowerCase()
-        const proxyRegistryAddr = contracts.WyvernProxyRegistry.toLowerCase()
-        const tokenTransferProxyAddr = contracts.WyvernTokenTransferProxy.toString()
-        const feeRecipientAddress = contracts.FeeRecipientAddress.toLowerCase()
+        const exchangeAddr = contracts.WyvernExchange
+        const proxyRegistryAddr = contracts.WyvernProxyRegistry
+        const tokenTransferProxyAddr = contracts.WyvernTokenTransferProxy
+        const feeRecipientAddress = contracts.FeeRecipientAddress
 
         this.contractAddresses = contracts
 
@@ -175,8 +95,8 @@ export class OpenseaEx extends EventEmitter {
         }
         this.feeRecipientAddress = feeRecipientAddress
         this.tokenTransferProxyAddress = tokenTransferProxyAddr
-        this.exchangeKeeper = contracts.ElementExchangeKeeper
-        this.elementSharedAsset = contracts?.ElementSharedAsset?.toLowerCase() || ""
+        this.exchangeKeeper = contracts.ExchangeKeeper
+        this.sharedAsset = contracts.SharedAssetAddress || ""
 
         this.userAccount = new UserAccount(wallet)
         const options = this.userAccount.signer
@@ -184,10 +104,8 @@ export class OpenseaEx extends EventEmitter {
             this.exchangeProxyRegistry = new ethers.Contract(proxyRegistryAddr, OpenseaABI.proxyRegistry.abi, options)
             this.exchange = new ethers.Contract(exchangeAddr, OpenseaABI.openseaExV2.abi, options)
             this.merkleValidator = new ethers.Contract(merkleProofAddr, OpenseaABI.merkleValidator.abi, options)
-
-
         } else {
-            throw new Error(`${this.walletInfo.chainId}  abi undefined`)
+            throw `${this.walletInfo.chainId} abi undefined`
         }
     }
 
@@ -360,7 +278,7 @@ export class OpenseaEx extends EventEmitter {
     public async createSellOrder({
                                      asset,
                                      quantity = 1,
-                                     paymentToken = this.ETH,
+                                     paymentToken = ETHToken,
                                      listingTime = 0,
                                      expirationTime = 0,
                                      startAmount,
@@ -519,7 +437,6 @@ export class OpenseaEx extends EventEmitter {
     }
 
     public async checkMatchOrder(orderStr: string) {
-        console.log(111)
         const {orderParm, orderJson} = getWyvOrderParams(orderStr)
         const orderHash = await this.exchange.hashToSign_(...orderParm)
         // 检查订单是否被批量取消-
@@ -538,12 +455,12 @@ export class OpenseaEx extends EventEmitter {
 
             const isCancelled = await this.exchange.cancelledOrFinalized(orderHash)
             if (isCancelled) {
-                console.log('cancelledOrFinalized', validParams)
-                if (orderJson.side === OrderType.Sell) {
-                    throw new ElementError({code: '1207', context: {orderSide: 'Sell'}, data: orderStr})
-                } else {
-                    throw new ElementError({code: '1207', context: {orderSide: 'Buy'}, data: orderStr})
+                let side = 'sell'
+                if (orderJson.side === OrderType.Buy) {
+                    side = 'buy'
                 }
+                console.log('cancelledOrFinalized', validParams)
+                throw side + ' Order cancelledOrFinalized false' + side
             }
 
             if (orderJson.v != 27 && orderJson.v != 28) {
@@ -576,7 +493,7 @@ export class OpenseaEx extends EventEmitter {
 
         if (orderJson.side === OrderType.Buy) {
             const maker = orderJson.maker
-            if (orderJson.paymentToken == NULL_ADDRESS) throw 'Buy order payment token can\'t be ETH'
+            if (orderJson.paymentToken == NULL_ADDRESS) throw 'Buy order payment token can\'t be ETHToken'
             const {allowance, balances} = await this.getTokenProxyApprove(orderJson.paymentToken, maker)
             const spend = new BigNumber(orderJson.basePrice)
             if (spend.gt(balances)) {
@@ -695,7 +612,6 @@ export class OpenseaEx extends EventEmitter {
         }
     }
 
-
     public async acceptOrder(orderStr: string) {
         await this.checkMatchOrder(orderStr)
         const {callData, sell} = await this.getMatchCallData({orderStr})
@@ -735,15 +651,14 @@ export class OpenseaEx extends EventEmitter {
         return ethSend(this.walletInfo, callData)
     }
 
-
     // cancel all order
     private async incrementNonce() {
-        const data = await this.exchange.methods.incrementNonce().encodeABI()
+        const data = await this.exchange.populateTransaction.incrementNonce()
         const callData = {
             from: this.walletInfo.address,
             to: this.exchange.options.address,
-            data
-        }
+            data: data.data
+        } as LimitedCallSpec
         const rpcUrl = this.walletInfo.rpcUrl || RPC_PROVIDER[this.walletInfo.chainId]
         await getEstimateGas(rpcUrl, callData)
         return ethSend(this.walletInfo, callData)
