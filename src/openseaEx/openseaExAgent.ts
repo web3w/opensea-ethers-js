@@ -1,18 +1,22 @@
 import EventEmitter from 'events'
 
 import {
+    BigNumber,
     BuyOrderParams,
     CreateOrderParams,
     ElementConfig,
+    ElementSchemaName,
+    ExAgent,
+    ExchangeMetadata, LimitedCallSpec,
     LowerPriceOrderParams,
     MatchParams,
+    metadataToAsset, NULL_ADDRESS,
     OrderType,
     SellOrderParams,
     WalletInfo
 } from "web3-wallets"
 
 import {OpenseaEx} from "./openseaEx";
-import {ExAgent} from "web3-wallets";
 import {OpenseaAPI} from "../api/opensea";
 
 
@@ -33,6 +37,45 @@ export class OpenseaExAgent extends EventEmitter implements ExAgent {
         this.openseaApi = new OpenseaAPI(wallet, conf)
         // this.walletProvider = walletProvider
         this.walletInfo = wallet
+    }
+
+    async getRegisterProxy(): Promise<{ isRegister: boolean, accountProxy: string, calldata: LimitedCallSpec | undefined }> {
+        const {accountProxy} = await this.contracts.getAccountProxy()
+        // const registerCallData =
+        const isRegister = accountProxy != NULL_ADDRESS
+        const calldata = isRegister ? undefined : await this.contracts.registerProxyCallData()
+        return {
+            isRegister,
+            accountProxy,
+            calldata
+        }
+    }
+
+    async getAssetApprove(metadatas: ExchangeMetadata[], decimals?: number) {
+        const assetApprove: any[] = []
+        for (const metadata of metadatas) {
+            const {asset, schema} = metadata
+            const metaAsset = metadataToAsset(metadata)
+            const {address, quantity} = asset
+            if (!quantity) throw 'Asset quantity is undefined'
+
+            if (schema == ElementSchemaName.ERC20) {
+                const {allowance, balances, calldata} = await this.contracts.getTokenProxyApprove(address)
+                const spend = new BigNumber(quantity).times(new BigNumber(10).pow(decimals || 18))
+                // if (spend.gt(balances)) {
+                //     // throw 'Token is not enough'
+                // }
+                assetApprove.push({
+                    isApprove: spend.lte(allowance),
+                    balances,
+                    calldata: spend.lte(allowance) ? undefined : calldata
+                })
+            } else if (schema == ElementSchemaName.ERC721 || schema == ElementSchemaName.ERC1155) {
+                const data = await this.contracts.getAssetProxyApprove(metaAsset)
+                assetApprove.push(data)
+            }
+        }
+        return assetApprove
     }
 
     async getOrderApproveStep(params: CreateOrderParams, side: OrderType) {

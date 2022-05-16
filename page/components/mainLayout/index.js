@@ -3,7 +3,7 @@ import React, {useState, useEffect, useContext} from "react";
 import {DesktopOutlined, FileOutlined, PieChartOutlined,} from '@ant-design/icons';
 import "./index.css"
 import {Context} from "../AppContext";
-import {NFTOrderList} from "./NFTOrderList";
+import {WatchNFTOrderList} from "./WatchNFTOrderList";
 import {UserOrderList} from "./UserOrderList";
 import {UserNFTList} from "./UserNFTList";
 import {OpenseaOrderList} from "./OpenseaOrderList";
@@ -18,7 +18,7 @@ export function MainLayout() {
     const [drawerVisible, setDrawerVisible] = useState(false);
 
 
-    const [selected, setSelected] = useState("OpenseaOrderList");
+    const [selected, setSelected] = useState("WatchNFTOrders");
     const onCollapse = (value) => {
         setCollapsed(value);
     };
@@ -56,12 +56,12 @@ export function MainLayout() {
     };
 
 
-    const SupportWallet = ['OpenseaOrderList', 'WatchNFTs', "AccountOrders", "AccountNFTs"]
+    const SupportWallet = ['OpenseaOrders', 'WatchNFTOrders', "AccountOrders", "AccountNFTs"]
     return (
         <Layout style={{minHeight: '100vh'}}>
             <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
                 <div className="logo">Element SDK</div>
-                <Menu theme="dark" defaultSelectedKeys={['OpenseaOrderList']} mode="inline"
+                <Menu theme="dark" defaultSelectedKeys={['WatchNFTOrders']} mode="inline"
                       onClick={selectWallet}>
                     {
                         SupportWallet.map(val => (
@@ -89,7 +89,7 @@ export function MainLayout() {
 
                 {selected == 'OpenseaOrderList' && <OpenseaOrderList/>}
 
-                {selected == 'WatchNFTs' && <NFTOrderList/>}
+                {selected == 'WatchNFTOrders' && <WatchNFTOrderList/>}
 
                 {selected == 'AccountOrders' && <UserOrderList/>}
 

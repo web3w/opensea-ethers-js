@@ -13,28 +13,36 @@ import {
 export {ElementSchemaName, BigNumber, NULL_ADDRESS, OrderType}
 export type {Asset, Token, ExchangeMetadata}
 
-export interface ChainInfo {
-    chain?: string
-    chainId?: string
+export interface OrdersQueryParams {
+    token_id: string
+    asset_contract_address: string
+    limit?: number
+    side?: number
 }
 
-export interface OrderQueryParams extends ChainInfo {
-    assetContractAddress: string //
-    tokenId: string
-    orderType: OrderType
-}
-
-export interface AssetQueryParams {
-    asset_contract_addresses: string
-    token_ids: string
+export interface AssetsQueryParams {
+    assets?: {
+        asset_contract_addresses: string
+        token_ids: string
+    }[],
+    owner?: string
+    limit?: number
+    include_orders?: boolean
 }
 
 export interface AssetCollection {
+    name: string
+    symbol: string
     payout_address?: string //opensea royalty fee address
     dev_seller_fee_basis_points?: number //open sea royalty fee
     seller_fee_basis_points?: number //open sea protocol fee
     address?: string
-    token_id: string
+    token_id?: string
+    schema_name?: string
+    nft_version?: string
+    created_date?: string
+    sell_orders?: any
+    buy_orders?: any
 }
 
 // https://testnets-api.opensea.io/api/v1/assets?include_orders=true&owner=0x9f7a946d935c8efc7a8329c0d894a69ba241345a&limit=50&asset_contract_addresses=0x4cddbf865ee2a1a3711648bb192e285f290f7985&token_ids=4676314080394472507455332797632474230665182066565445726959043747700191264868&asset_contract_addresses=0xb556f251eacbec4badbcddc4a146906f2c095bee&token_ids=2&asset_contract_addresses=0x5fecbbbaf9f3126043a48a35eb2eb8667d469d53&token_ids=719455&asset_contract_addresses=0xb556f251eacbec4badbcddc4a146906f2c095bee&token_ids=3
@@ -46,8 +54,6 @@ export interface AssetCollection {
 //     ethPrice?: string
 //     usdPrice?: string
 // }
-
-
 
 
 //----------- OrderJSON--------------

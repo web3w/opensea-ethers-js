@@ -8,7 +8,7 @@ import {
 
 
 import {
-    ethSend, ethSendGas, ElementSchemaName, LimitedCallSpec,
+    ethSend, ElementSchemaName, LimitedCallSpec,
     WalletInfo, getEstimateGas, UserAccount, ElementConfig, RPC_PUB_PROVIDER
 } from "web3-wallets";
 

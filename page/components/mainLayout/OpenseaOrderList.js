@@ -8,6 +8,38 @@ import {nftOrder} from './config'
 
 const {asset, columns} = nftOrder
 
+async function getOrders() {
+    const dataList = asset[chainId]
+    for (let nfts of dataList) {
+        const {children, address} = nfts
+        for (let asset of children) {
+            asset['assetAddress'] = address
+            const {name} = asset
+            const params = {
+                token_id: name,
+                asset_contract_address: address
+            }
+            const list = await eleSDK.openseaApi.getOrders(params)
+            asset.children = []
+            for (const edge of list) {
+                const {metadata, quantity, side, listingTime, basePrice, maker} = edge
+                asset.children.push({
+                    standard: 'OpenSea',
+                    quantity,
+                    side,
+                    priceUSD: basePrice,
+                    key: listingTime,
+                    address: maker,
+                    name: listingTime
+                })
+            }
+
+        }
+    }
+    // console.log(data)
+    setDataSource(dataList)
+}
+
 export function OpenseaOrderList(props) {
     const {eleSDK, wallet} = useContext(Context)
     const [dataSource, setDataSource] = useState([])
@@ -20,7 +52,7 @@ export function OpenseaOrderList(props) {
     const showModal = async (record) => {
         setCreateOrderVisible(true)
         console.log('showModal', record)
-        const owner = await eleSDK.userAccount.getERC721OwnerOf(record.assetAddress, record.name)
+        const owner = await wallet.userAccount.getERC721OwnerOf(record.assetAddress, record.name)
         record['owner'] = owner
         setSelectOrder(record)
     }
@@ -30,26 +62,23 @@ export function OpenseaOrderList(props) {
     }
 
     const postOrder = async (visible) => {
-
-        console.log(selectOrder)
-        // {
-        //     "key": 11,
-        //     "name": "719455",
-        //     "assetAddress": "0x5fecbbbaf9f3126043a48a35eb2eb8667d469d53",
-        //     "children": [],
-        //     "owner": "0xeA199722372dea9DF458dbb56be7721af117a9Bc"
-        // }
+        const assets = [{
+            asset_contract_addresses: selectOrder.assetAddress, //
+            token_ids: selectOrder.name
+        }]
+        const foo = {assets}
+        const asset = await eleSDK.openseaApi.getAssets(foo)
         const sellAsset = {
             tokenId: selectOrder.name,
             tokenAddress: selectOrder.assetAddress,
             schemaName: 'ERC721',
             collection: {
-                elementSellerFeeBasisPoints: 500,
-                transferFeeAddress: "0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401"
+                elementSellerFeeBasisPoints: asset[0].dev_seller_fee_basis_points,
+                transferFeeAddress: asset[0].payout_address
             }
         }
-        // paymentToken: sellEx.contracts.ETH,
-        //['No expiration_time was set, expiration_time must be within 6 months of order creation.']
+        debugger
+
         const sellParams = {
             asset: sellAsset,
             startAmount: 0.6
@@ -63,13 +92,14 @@ export function OpenseaOrderList(props) {
 
     const getAssets = async () => {
         const dataList = asset[chainId]
-        const query =dataList.map(val=>{
+        const assets = dataList.map(val => {
             return {
                 asset_contract_addresses: val.address, //
                 token_ids: val.children[0].name
             }
         })
-        const list = await eleSDK.openseaApi.getAssets(account,query)
+        const foo = { assets}
+        const list = await eleSDK.openseaApi.getAssets(foo)
         console.log(list)
     };
 
@@ -100,17 +130,17 @@ export function OpenseaOrderList(props) {
                     asset['assetAddress'] = address
                     const {name} = asset
                     const params = {
-                        tokenId: name,
-                        assetContractAddress: address,
-                        orderType: OrderType.Sell
+                        token_id: name,
+                        asset_contract_address: address
                     }
-                    // const list = await eleSDK.openseaApi.getOrders(params)
-                    const infoList = [] //list.inforList
+                    const list = await eleSDK.openseaApi.getOrders(params)
                     asset.children = []
-                    for (const edge of infoList) {
-                        debugger
-                        const {metadata, quantity, side, listingTime, basePrice, maker} = edge
+                    for (const order of list) {
+                        const {metadata, quantity, side, listingTime, basePrice, maker} = order
                         asset.children.push({
+                            tokenId: name,
+                            tokenAddress: address,
+                            order: order,
                             standard: 'OpenSea',
                             quantity,
                             side,
@@ -123,7 +153,6 @@ export function OpenseaOrderList(props) {
 
                 }
             }
-            // console.log(data)
             setDataSource(dataList)
         }
 

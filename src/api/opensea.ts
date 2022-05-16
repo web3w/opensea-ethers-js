@@ -3,7 +3,7 @@ import {ElementConfig, OrderType, WalletInfo} from "web3-wallets";
 import {orderToJSON} from "../openseaEx/utils/makeOrder";
 import {openseaOrderFromJSON} from "../openseaEx/utils/helper";
 import QueryString from "querystring";
-import {AssetCollection, AssetQueryParams, OrderQueryParams} from "../openseaEx/types";
+import {AssetCollection, AssetsQueryParams, OrdersQueryParams} from "../openseaEx/types";
 
 
 const ORDERBOOK_VERSION = 1
@@ -22,46 +22,49 @@ const apiConfig = {
 }
 
 export class OpenseaAPI extends Fetch {
-    public accountAddress = ''
-
     constructor(
         wallet: WalletInfo,
         config?: ElementConfig
     ) {
         super()
-        if (apiConfig[wallet.chainId]) {
-            this.apiBaseUrl = config?.apiBaseUrl || apiConfig[wallet.chainId].apiBaseUrl
-            this.apiKey = config?.account || apiConfig[wallet.chainId].apiKey
+        const {chainId} = wallet
+        if (apiConfig[chainId]) {
+            this.apiBaseUrl = config?.apiBaseUrl || apiConfig[chainId].apiBaseUrl
+            this.apiKey = config?.authToken || apiConfig[chainId].apiKey
+        } else {
+            throw 'OpenseaAPI unsport chainId:' + wallet.chainId
         }
     }
 
-    public async getAssets(owner: string, queryParams: AssetQueryParams[]): Promise<AssetCollection[]> {
-        const list = queryParams.map((val: any) => {
+    public async getAssets(queryParams: AssetsQueryParams): Promise<AssetCollection[]> {
+        const {owner, include_orders, limit, assets} = queryParams
+        const list = assets ? assets.map((val: any) => {
             return QueryString.stringify(val)
-        })
+        }) : []
         const assetList = list.join('&')
-
         const query = {
-            include_orders: true,
-            owner,
-            limit: 50
+            include_orders: include_orders || false,
+            limit: limit || 10
         }
-        const queryUrl = `${QueryString.stringify(query)}&${assetList}`
+        if (owner) {
+            query['owner'] = owner
+        }
+        const queryUrl = list.length > 0
+            ? `${QueryString.stringify(query)}&${assetList}`
+            : QueryString.stringify(query)
         const json = await this.getURL('/api/v1/assets', queryUrl)
 
-        const assets = json.assets.map(val => ({...val.asset_contract, token_id: val.token_id}))
-
-        return assets
-
+        return json.assets.map(val => ({
+            ...val.asset_contract,
+            buy_orders: val.buy_orders,
+            sell_orders: val.sell_orders,
+            token_id: val.token_id
+        }))
     }
 
-    public async getOrders(queryParams: OrderQueryParams): Promise<any> {
-        const limit = 2
-        const asset_contract_address = queryParams.assetContractAddress
-        const token_id = queryParams.tokenId
-        const side = queryParams.orderType || 1//queryParams.orderType
-        const query = {token_id, asset_contract_address, limit, side}
-        console.log(query)
+    public async getOrders(queryParams: OrdersQueryParams): Promise<any> {
+        const {token_id, asset_contract_address} = queryParams
+        const query = {token_id, asset_contract_address, limit: queryParams.limit || 2, side: queryParams.side || 1}
         const json = await this.get(`${ORDERBOOK_PATH}/orders`, query, {
             headers: {
                 "X-API-KEY": this.apiKey
@@ -76,7 +79,7 @@ export class OpenseaAPI extends Fetch {
             const order = openseaOrderFromJSON(orders[i])
             eleOrders.push(orderToJSON(order))
         }
-        return {recordCount: eleOrders.length, inforList: eleOrders}
+        return eleOrders
     }
 
     public async postSingedOrder(orderStr: string): Promise<any> {
