@@ -97,7 +97,7 @@ export const OPENSEA_CONTRACTS_ADDRESSES: { [key: number]: any } = {
         'AssetContractShared': "0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656",
         'ExchangeKeeper': "0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656"
     },
-    137: {//rinkeby
+    137: {//bsc
         'MerkleProof': '0x45b594792a5cdc008d0de1c1d69faa3d16b3ddc1',
         'WyvernExchange': '0xdD54D660178B28f6033a953b0E55073cFA7e3744',
         'WyvernProxyRegistry': '0x1E525EEAF261cA41b809884CBDE9DD9E1619573A',

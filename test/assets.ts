@@ -25,7 +25,6 @@ export const asset1155Share = {
 
 export const asset721 = {
     4: [
-
         {
             tokenId: '9',
             tokenAddress: '0xb556f251eacbec4badbcddc4a146906f2c095bee',

@@ -7,7 +7,6 @@ import {OpenseaAPI} from "../../../src/api/opensea";
 const rpcUrl = 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
 const buyer = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
 const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
-import * as QueryString from "querystring";
 import * as dns from "dns";
 import * as https from "https";
 

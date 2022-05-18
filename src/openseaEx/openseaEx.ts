@@ -21,7 +21,7 @@ import {
     LimitedCallSpec,
     MatchParams,
     SellOrderParams,
-    ETHToken
+    NullToken
 } from 'web3-wallets'
 import {Contract, ethers} from "ethers";
 import {Order, OrderJSON, UnhashedOrder} from "./types";
@@ -144,7 +144,7 @@ export class OpenseaEx extends EventEmitter {
 
     async getOrderApproveStep(params: CreateOrderParams, side: OrderType) {
         try {
-            const {asset, paymentToken, startAmount} = params
+            const {asset, paymentToken, startAmount, quantity} = params
             const tokenAddr = paymentToken ? paymentToken.address : NULL_ADDRESS
             const decimals: number = paymentToken ? paymentToken.decimals : 18
             let accountRegister, assetApprove, tokenApprove
@@ -158,6 +158,9 @@ export class OpenseaEx extends EventEmitter {
                     calldate: accountProxy != NULL_ADDRESS ? undefined : await this.registerProxyCallData()
                 }
                 assetApprove = await this.getAssetProxyApprove(asset)
+                if (Number(assetApprove.balances) < Number(quantity)) {
+                    throw 'Asset is not enough'
+                }
             }
             //transfer fee
             if (tokenAddr != NULL_ADDRESS) {
@@ -278,7 +281,7 @@ export class OpenseaEx extends EventEmitter {
     public async createSellOrder({
                                      asset,
                                      quantity = 1,
-                                     paymentToken = ETHToken,
+                                     paymentToken = NullToken,
                                      listingTime = 0,
                                      expirationTime = 0,
                                      startAmount,
@@ -290,6 +293,12 @@ export class OpenseaEx extends EventEmitter {
         if (!accountRegister.isApprove) {
             const tx = await ethSend(this.walletInfo, accountRegister.calldata)
             await tx.wait()
+        }
+
+        if (!assetApprove.isApprove) {
+            const tx = await ethSend(this.walletInfo, assetApprove.calldata)
+            await tx.wait()
+            console.log(tx.hash)
         }
 
         if (!assetApprove.isApprove) {
@@ -493,7 +502,7 @@ export class OpenseaEx extends EventEmitter {
 
         if (orderJson.side === OrderType.Buy) {
             const maker = orderJson.maker
-            if (orderJson.paymentToken == NULL_ADDRESS) throw 'Buy order payment token can\'t be ETHToken'
+            if (orderJson.paymentToken == NULL_ADDRESS) throw 'Buy order payment token can\'t be ETH'
             const {allowance, balances} = await this.getTokenProxyApprove(orderJson.paymentToken, maker)
             const spend = new BigNumber(orderJson.basePrice)
             if (spend.gt(balances)) {

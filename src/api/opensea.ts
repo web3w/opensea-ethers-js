@@ -21,6 +21,7 @@ const apiConfig = {
     }
 }
 
+
 export class OpenseaAPI extends Fetch {
     constructor(
         wallet: WalletInfo,
@@ -104,11 +105,11 @@ export class OpenseaAPI extends Fetch {
 
     public async postSingedOrder(orderStr: string, retries = 2): Promise<any> {
         const singSellOrder = JSON.parse(orderStr)
-        delete singSellOrder.hash
-        delete singSellOrder.offerType
-        singSellOrder.calldata = singSellOrder.dataToCall
+        // delete singSellOrder.hash
+        // delete singSellOrder.offerType
+        // singSellOrder.calldata = singSellOrder.dataToCall
         // singSellOrder.nonce = singSellOrder.nonce.toString()
-        delete singSellOrder.dataToCall
+        // delete singSellOrder.dataToCall
 
         try {
             const opts = {
@@ -116,11 +117,15 @@ export class OpenseaAPI extends Fetch {
                     'X-API-KEY': this.apiKey
                 }
             }
-            const json = await this.post(
+            const result = await this.post(
                 `${ORDERBOOK_PATH}/orders/post`,
                 singSellOrder,
                 opts
-            )
+            ).catch((e: any) => {
+                console.log(e)
+                throw e
+            })
+            return result
         } catch (error: any) {
             this.throwOrContinue(error, retries)
             await Sleep(3000)
