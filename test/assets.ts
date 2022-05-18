@@ -25,6 +25,7 @@ export const asset1155Share = {
 
 export const asset721 = {
     4: [
+
         {
             tokenId: '9',
             tokenAddress: '0xb556f251eacbec4badbcddc4a146906f2c095bee',
@@ -89,6 +90,13 @@ export const asset721 = {
 }
 
 export const asset1155 = {
+    4: [
+        {
+            tokenId: '82534249212256588388302984865502979938480676321224842567195230008927460524332',
+            tokenAddress: '0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656',
+            schemaName: 'ERC1155'
+        }
+    ],
     97: [
         {
             tokenId: '1',

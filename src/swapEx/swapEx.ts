@@ -9,7 +9,7 @@ import {
 
 import {
     ethSend, ElementSchemaName, LimitedCallSpec,
-    WalletInfo, getEstimateGas, UserAccount, ElementConfig, RPC_PUB_PROVIDER
+    WalletInfo, getEstimateGas, UserAccount, APIConfig, RPC_PUB_PROVIDER
 } from "web3-wallets";
 
 export interface SimpleTrades {

@@ -126,6 +126,7 @@ export function OpenseaOrderList(props) {
             const dataList = asset[chainId]
             for (let nfts of dataList) {
                 const {children, address} = nfts
+                debugger
                 for (let asset of children) {
                     asset['assetAddress'] = address
                     const {name} = asset
@@ -135,6 +136,7 @@ export function OpenseaOrderList(props) {
                     }
                     const list = await eleSDK.openseaApi.getOrders(params)
                     asset.children = []
+                    debugger
                     for (const order of list) {
                         const {metadata, quantity, side, listingTime, basePrice, maker} = order
                         asset.children.push({

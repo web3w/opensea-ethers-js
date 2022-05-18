@@ -13,11 +13,18 @@ import {
 export {ElementSchemaName, BigNumber, NULL_ADDRESS, OrderType}
 export type {Asset, Token, ExchangeMetadata}
 
-export interface OrdersQueryParams {
-    token_id: string
+export interface AssetOrdersQueryParams {
+    token_ids: string[]
     asset_contract_address: string
+    payment_token_address?: string
+    include_bundled?: boolean
+    maker?: string
+    taker?: string
+    owner?: string
+    offset?: number
     limit?: number
     side?: number
+    order_by?: string
 }
 
 export interface AssetsQueryParams {
@@ -78,7 +85,7 @@ export interface OrderJSON extends Partial<ECSignature> {
     saleKind: number
     target: string
     howToCall: number
-    dataToCall: string
+    calldata: string
     replacementPattern: string
     staticTarget: string
     staticExtradata: string
@@ -118,7 +125,7 @@ export interface BaseOrder {
     saleKind: number
     target: string
     howToCall: number
-    dataToCall: string
+    calldata: string
     replacementPattern: string
     staticTarget: string
     staticExtradata: string
@@ -281,7 +288,7 @@ export interface OrderJSON extends Partial<ECSignature> {
     saleKind: number
     target: string
     howToCall: number
-    dataToCall: string
+    calldata: string
     replacementPattern: string
     staticTarget: string
     staticExtradata: string

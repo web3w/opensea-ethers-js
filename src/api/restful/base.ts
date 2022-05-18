@@ -1,6 +1,14 @@
 import * as QueryString from "querystring";
+import {HttpsProxyAgent} from "https-proxy-agent";
+import fetch from 'node-fetch';
 
-import {ElementConfig} from "web3-wallets";
+export async function Sleep(ms: number) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            resolve({status: 'wakeUp'})
+        }, ms)
+    })
+}
 
 export class Fetch {
     /**
@@ -8,6 +16,8 @@ export class Fetch {
      */
     public apiBaseUrl: string
     public apiKey: string
+    public proxyUrl: string
+    public apiTimeout: number
     // public chain: string
     /**
      * Logger function to use when debugging
@@ -15,12 +25,10 @@ export class Fetch {
     public logger: (arg: string) => void = console.log
 
     constructor() {
-
         this.apiBaseUrl = ""
-        // this.chain = CHAIN[chainId]
-        this.apiKey = ''
-        // Debugging: default to nothing
-        // this.logger = logger || ((arg: string) => arg)
+        this.apiKey = ""
+        this.proxyUrl = ""
+        this.apiTimeout = 2000
     }
 
     /**
@@ -45,13 +53,12 @@ export class Fetch {
         return response.json()
     }
 
-    async getURL(apiPath, qs:string, opts: RequestInit = {}) {
-
+    async getURL(apiPath, qs: string, opts: RequestInit = {}) {
         const url = `${apiPath}?${qs}`
-
         // return this._fetch(url)
         const response = await this._fetch(url, opts)
         return response.json()
+
     }
 
     /**
@@ -71,7 +78,7 @@ export class Fetch {
                 'Content-Type': 'application/json',
                 ...(opts.headers || {})
             }
-        }
+        } as RequestInit
 
         // return post(this.apiBaseUrl, apiPath, body)
 
@@ -108,20 +115,39 @@ export class Fetch {
      * @param apiPath Path to URL endpoint under API
      * @param opts RequestInit opts, similar to Fetch API
      */
-    public async _fetch(apiPath: string, opts: RequestInit = {}) {
+    public async _fetch(apiPath: string, opts: RequestInit = {}, timeout?: number) {
         const apiBase = this.apiBaseUrl
-        const finalUrl1 = `${apiBase}${apiPath}`
+        const finalUrl = `${apiBase}${apiPath}`
+
+        const controller = new AbortController();
+
+        const timeoutId = setTimeout(() => controller.abort(), timeout || this.apiTimeout);
+
+        let finalOpts: RequestInit = {
+            signal: controller.signal
+        }
+
+
         if (opts) {
-            const finalOpts = {
+            finalOpts = {
                 ...opts,
                 headers: {
                     ...(opts.headers || {})
-                }
-            }
-            return fetch(finalUrl1, finalOpts).then(async (res: any) => this._handleApiResponse(res))
-        } else {
-            return fetch(finalUrl1)
+                },
+                signal: controller.signal
+            } as RequestInit
         }
+        // if (this.apiKey) {
+        //     // finalOpts.headers['X-API-KEY'] = this.apiKey
+        // }
+
+        if (this.proxyUrl) {
+            const agent = new HttpsProxyAgent(this.proxyUrl);
+            finalOpts['agent'] = agent
+        }
+        const data = await fetch(finalUrl, finalOpts).then(async (res: any) => this._handleApiResponse(res))
+        clearTimeout(timeoutId);
+        return data
     }
 
     private async _handleApiResponse(response: Response) {

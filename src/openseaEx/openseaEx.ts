@@ -12,7 +12,7 @@ import {
     UserAccount,
     BigNumber,
     Token,
-    ElementConfig,
+    APIConfig,
     OrderType,
     RPC_PUB_PROVIDER,
     NULL_ADDRESS, Asset, NULL_BLOCK_HASH, ElementSchemaName,
@@ -36,6 +36,7 @@ import {
 import {ElementError} from "./utils/error";
 import {metadataToAsset, getWyvOrderParams, getEIP712TypedData} from "./utils/helper";
 import {DEFAULT_EXPIRATION_TIME, DEFAULT_LISTING_TIME, DEFAULT_SELLER_FEE_BASIS_POINTS} from "./utils/constants";
+import assetContractShared from "../contracts/abi/openseaV2/AssetContractShared.json";
 
 
 const RPC_PROVIDER = RPC_PUB_PROVIDER
@@ -43,28 +44,25 @@ const RPC_PROVIDER = RPC_PUB_PROVIDER
 export class OpenseaEx extends EventEmitter {
     public walletInfo: WalletInfo
     public protocolFeePoint = DEFAULT_SELLER_FEE_BASIS_POINTS
-    // public assetSchemas: any
     // address
     public contractAddresses: any
     // public WETHAddr: string
-    public sharedAsset: string
     public exchangeKeeper: string
     public feeRecipientAddress: string
     public tokenTransferProxyAddress: string
     public accountProxyAddress: string
 
-    // abi
-    // public authenticatedProxy: Contract
-
     // contracts
     public merkleValidator: Contract
     public exchange: Contract
     public exchangeProxyRegistry: Contract
+    public assetShared: Contract
+
     public userAccount: UserAccount
 
     public GasWarpperToken: Token
 
-    constructor(wallet: WalletInfo, config?: ElementConfig) {
+    constructor(wallet: WalletInfo, config?: APIConfig) {
         super()
         const contracts = config?.contractAddresses || OPENSEA_CONTRACTS_ADDRESSES[wallet.chainId]
         if (config?.protocolFeePoint) {
@@ -84,6 +82,7 @@ export class OpenseaEx extends EventEmitter {
         const proxyRegistryAddr = contracts.WyvernProxyRegistry
         const tokenTransferProxyAddr = contracts.WyvernTokenTransferProxy
         const feeRecipientAddress = contracts.FeeRecipientAddress
+        const assetSharedAddress = contracts.AssetContractShared
 
         this.contractAddresses = contracts
 
@@ -96,7 +95,7 @@ export class OpenseaEx extends EventEmitter {
         this.feeRecipientAddress = feeRecipientAddress
         this.tokenTransferProxyAddress = tokenTransferProxyAddr
         this.exchangeKeeper = contracts.ExchangeKeeper
-        this.sharedAsset = contracts.SharedAssetAddress || ""
+
 
         this.userAccount = new UserAccount(wallet)
         const options = this.userAccount.signer
@@ -104,6 +103,7 @@ export class OpenseaEx extends EventEmitter {
             this.exchangeProxyRegistry = new ethers.Contract(proxyRegistryAddr, OpenseaABI.proxyRegistry.abi, options)
             this.exchange = new ethers.Contract(exchangeAddr, OpenseaABI.openseaExV2.abi, options)
             this.merkleValidator = new ethers.Contract(merkleProofAddr, OpenseaABI.merkleValidator.abi, options)
+            this.assetShared = new ethers.Contract(assetSharedAddress, OpenseaABI.assetContractShared.abi, options)
         } else {
             throw `${this.walletInfo.chainId} abi undefined`
         }
@@ -242,8 +242,8 @@ export class OpenseaEx extends EventEmitter {
                 sell.makerRelayerFee, sell.takerRelayerFee, sell.makerProtocolFee, sell.takerProtocolFee, sell.basePrice, sell.extra, sell.listingTime, sell.expirationTime, sell.salt],
             [buy.feeMethod, buy.side, buy.saleKind, buy.howToCall,
                 sell.feeMethod, sell.side, sell.saleKind, sell.howToCall],
-            buy.dataToCall,
-            sell.dataToCall,
+            buy.calldata,
+            sell.calldata,
             buy.replacementPattern,
             sell.replacementPattern,
             buy.staticExtradata,
@@ -332,7 +332,7 @@ export class OpenseaEx extends EventEmitter {
             target
         } = await this.encodeCallData(sellOrder, sellOrderParams.buyerAddress)
         sellOrder.target = target
-        sellOrder.dataToCall = dataToCall
+        sellOrder.calldata = dataToCall
         sellOrder.replacementPattern = replacementPattern
 
         return this.creatSignedOrder({unHashOrder: sellOrder})
@@ -377,7 +377,7 @@ export class OpenseaEx extends EventEmitter {
         buyOrder.howToCall = 1
         const {dataToCall, replacementPattern, target} = await this.encodeCallData(buyOrder, accountAddress)
         buyOrder.target = target
-        buyOrder.dataToCall = dataToCall
+        buyOrder.calldata = dataToCall
         buyOrder.replacementPattern = replacementPattern
         return this.creatSignedOrder({unHashOrder: buyOrder})
     }
@@ -573,7 +573,7 @@ export class OpenseaEx extends EventEmitter {
 
         // unsignData.maker =
         const {dataToCall, replacementPattern} = await this.encodeCallData(unsignData, assetRecipientAddress)
-        unsignData.dataToCall = dataToCall
+        unsignData.calldata = dataToCall
         unsignData.replacementPattern = replacementPattern
 
         return assignOrdersToSides(signedOrder, unsignData)
@@ -586,9 +586,9 @@ export class OpenseaEx extends EventEmitter {
 
         // debugger
         const isCalldataCanMatch = await exchange.orderCalldataCanMatch(
-            buy.dataToCall,
+            buy.calldata,
             buy.replacementPattern,
-            sell.dataToCall,
+            sell.calldata,
             sell.replacementPattern).catch((e: any) => {
             throw 'orderCalldataCanMatch error'
         })
@@ -596,7 +596,7 @@ export class OpenseaEx extends EventEmitter {
             // buyReplacementPattern Buy-side order calldata replacement mask
             // sellReplacementPattern Sell-side order calldata replacement mask
             // Whether the orders' calldata can be matched
-            console.log('isCalldataCanMatch buy \n', buy.dataToCall, '\n', buy.replacementPattern, '\n sell \n', sell.dataToCall, '\n', sell.replacementPattern)
+            console.log('isCalldataCanMatch buy \n', buy.calldata, '\n', buy.replacementPattern, '\n sell \n', sell.calldata, '\n', sell.replacementPattern)
             throw 'orderCalldataCanMatch error'
         }
         const isCanMatch = await exchange.ordersCanMatch_(...params).catch((e: any) => {

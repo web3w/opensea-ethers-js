@@ -1,8 +1,6 @@
 import {
     Asset,
-    ElementSchemaName,
     HowToCall,
-
     Order,
     OrderJSON,
     SaleKind,
@@ -17,13 +15,12 @@ import {_getBuyFeeParameters, _getSellFeeParameters, computeFees} from './fees'
 import {
     MAX_DIGITS_IN_UNSIGNED_256_INT,
     MIN_EXPIRATION_SECONDS,
-    NULL_ADDRESS,
     ORDER_MATCHING_LATENCY_SECONDS,
     STATIC_EXTRADATA
 } from './constants'
 import {makeBigNumber, toBaseUnitAmount} from './helper'
-import {OfferType, OrderType} from "web3-wallets";
-import {MetaAsset} from "web3-wallets/lib/src/agentTypes";
+import {OfferType, OrderType,NULL_ADDRESS,MetaAsset} from "web3-wallets";
+
 
 // export enum OfferType {
 //     ItemOffer = 'item_offer',
@@ -263,7 +260,7 @@ export async function _makeBuyOrder({
         saleKind: SaleKind.FixedPrice,
         target: "",
         howToCall: HowToCall.Call,
-        dataToCall: "",
+        calldata: "",
         replacementPattern: "",
         staticTarget: NULL_ADDRESS,
         staticExtradata: "0x",
@@ -383,7 +380,7 @@ export async function _makeSellOrder({
         saleKind: orderSaleKind,
         target: "",
         howToCall: HowToCall.Call,
-        dataToCall: "",
+        calldata: "",
         replacementPattern: "",
         staticTarget: NULL_ADDRESS,
         staticExtradata: "0x",
@@ -414,7 +411,7 @@ export const orderToJSON = (order: Order): OrderJSON => {
         saleKind: order.saleKind,
         target: order.target.toLowerCase(),
         howToCall: order.howToCall,
-        dataToCall: order.dataToCall,
+        calldata: order.calldata,
         replacementPattern: order.replacementPattern,
         staticTarget: order.staticTarget.toLowerCase(),
         staticExtradata: order.staticExtradata,
@@ -490,7 +487,7 @@ export function _makeMatchingOrder({
         saleKind: SaleKind.FixedPrice,
         target: order.target,
         howToCall: order.howToCall,
-        dataToCall: order.dataToCall,
+        calldata: order.calldata,
         replacementPattern: order.replacementPattern,
         staticTarget: NULL_ADDRESS,
         staticExtradata: '0x',
@@ -563,7 +560,7 @@ export const orderFromJSON = (order: any): Order => {
         saleKind: order.saleKind,
         target: order.target,
         howToCall: order.howToCall,
-        dataToCall: order.dataToCall,
+        calldata: order.calldata,
         replacementPattern: order.replacementPattern,
         staticTarget: order.staticTarget,
         staticExtradata: order.staticExtradata,

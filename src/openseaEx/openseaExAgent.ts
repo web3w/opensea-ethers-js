@@ -4,7 +4,7 @@ import {
     BigNumber,
     BuyOrderParams,
     CreateOrderParams,
-    ElementConfig,
+    APIConfig,
     ElementSchemaName,
     ExAgent,
     ExchangeMetadata, LimitedCallSpec,
@@ -19,16 +19,15 @@ import {
 import {OpenseaEx} from "./openseaEx";
 import {OpenseaAPI} from "../api/opensea";
 
-
 export class OpenseaExAgent extends EventEmitter implements ExAgent {
     public contracts: OpenseaEx
     public walletInfo: WalletInfo
     public openseaApi: OpenseaAPI
 
-    constructor(wallet: WalletInfo, config?: ElementConfig) {
+    constructor(wallet: WalletInfo, config?: APIConfig) {
         super()
         const {chainId, address} = wallet
-        let conf: ElementConfig = {chainId}
+        let conf: APIConfig = {chainId}
         if (config) {
             conf = config
         }

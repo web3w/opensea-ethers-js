@@ -14,11 +14,30 @@ import * as https from "https";
 import fetch from 'node-fetch';
 
 // const HttpProxyAgent = require('https-proxy-agent');
-import {HttpsProxyAgent} from 'https-proxy-agent'
+import {HttpsProxyAgent} from 'https-proxy-agent';
 
-    ;
+const controller = new AbortController();
 
-(async () => {
+const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+;(async () => {
+        try {
+            // const url = 'https://www.google.com/'
+            // const url = 'https://www.baidu.com/'
+            // const url = 'https://testnets-api.opensea.io/api/v1/assets?include_orders=true&owner=0x9F7A946d935c8Efc7A8329C0d894A69bA241345A&limit=50&asset_contract_addresses=0xb556f251eacbec4badbcddc4a146906f2c095bee&token_ids=9'
+            const url =  'https://testnets-api.opensea.io/wyvern/v1/orders?token_ids=9&asset_contract_address=0xb556f251eacbec4badbcddc4a146906f2c095bee&limit=10&side=0&order_by=created_date'
+            const agent = new HttpsProxyAgent('http://127.0.0.1:7890');
+            const google = await fetch(url, {signal: controller.signal,agent});
+            console.log(google.status)
+            console.log(await google.json())
+            clearTimeout(timeoutId);
+        } catch (err: any) {
+            console.log(err)
+            clearTimeout(timeoutId);
+        }
+        return
+
+
         const url = 'https://testnets-api.opensea.io/api/v1/assets?include_orders=true&owner=0x9F7A946d935c8Efc7A8329C0d894A69bA241345A&limit=50&asset_contract_addresses=0xb556f251eacbec4badbcddc4a146906f2c095bee&token_ids=9'
         const host = 'testnets-api.opensea.io'
         const fetchParam = {

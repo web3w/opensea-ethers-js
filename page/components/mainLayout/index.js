@@ -87,7 +87,7 @@ export function MainLayout() {
                     </Descriptions>}
                 </Header>
 
-                {selected == 'OpenseaOrderList' && <OpenseaOrderList/>}
+                {selected == 'OpenseaOrders' && <OpenseaOrderList/>}
 
                 {selected == 'WatchNFTOrders' && <WatchNFTOrderList/>}
 

@@ -3,8 +3,6 @@ import React, {useContext, useEffect, useState} from "react";
 import {Context} from '../AppContext'
 import "./index.css"
 import {OrderType} from "web3-wallets";
-
-// const {nftOrder} = require("./config.json")
 import {nftOrder} from './config'
 import {CreateOrderForm} from "./CreateOrderForm";
 
@@ -69,7 +67,7 @@ export function WatchNFTOrderList(props) {
                 })
                 const assetParams = {assets, include_orders: true}
                 const list = await eleSDK.openseaApi.getAssets(assetParams)
-                debugger
+
                 // for (let asset of children) {
                 //
                 // }

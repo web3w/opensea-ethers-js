@@ -10,7 +10,6 @@ import {
     ExchangeMetadata
 } from '../types'
 
-
 export function toBaseUnitAmount(amount: BigNumber, decimals: number): BigNumber {
     const unit = new BigNumber(10).pow(decimals)
     return amount.times(unit).integerValue()
@@ -96,7 +95,7 @@ export function getEIP712TypedData(orderStr: string, eip712Domain: any, nonce: n
             saleKind: Number(order.saleKind),
             target: order.target,
             howToCall: Number(order.howToCall),
-            calldata: order.dataToCall,
+            calldata: order.calldata,
             replacementPattern: order.replacementPattern,
             staticTarget: order.staticTarget,
             staticExtradata: order.staticExtradata,
@@ -110,7 +109,6 @@ export function getEIP712TypedData(orderStr: string, eip712Domain: any, nonce: n
         }
     }
 }
-
 
 export function getWyvOrderParams(orderStr: string): { orderJson: any, orderParm: Array<any> } {
     const order: OrderJSON = JSON.parse(orderStr)
@@ -131,7 +129,7 @@ export function getWyvOrderParams(orderStr: string): { orderJson: any, orderParm
         order.side,
         order.saleKind,
         order.howToCall,
-        order.dataToCall,// order.calldata,
+        order.calldata,// order.calldata,
         order.replacementPattern,
         order.staticExtradata
     ]
@@ -158,7 +156,6 @@ export function metadataToAsset(metadata: ExchangeMetadata, data?: Asset): Asset
         schemaName: metadata.schema
     }
 }
-
 
 export const openseaOrderFromJSON = (order: any): Order => {
     // console.log(order)
@@ -189,7 +186,7 @@ export const openseaOrderFromJSON = (order: any): Order => {
         saleKind: order.sale_kind,
         target: order.target,
         howToCall: order.how_to_call,
-        dataToCall: order.calldata,//dataToCall
+        calldata: order.calldata,//dataToCall
         replacementPattern: order.replacement_pattern,
         staticTarget: order.static_target,
         staticExtradata: order.static_extradata,

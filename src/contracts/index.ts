@@ -2,7 +2,8 @@
 import proxyRegistryABI from './abi/openseaV2/WyvernProxyRegistry.json'
 import exchangeABI from './abi/openseaV2/WyvernExchange.json'
 import merkleValidatorABI from './abi/openseaV2/MerkleValidator.json'
-import OpenseaExSwap from './abi/aggtrade/OpenseaExSwap.json'
+import assetContractShared from './abi/openseaV2/AssetContractShared.json'
+import openseaExSwap from './abi/aggtrade/OpenseaExSwap.json'
 
 export interface AbiInfo {
     contractName: string
@@ -12,10 +13,11 @@ export interface AbiInfo {
 
 // authenticatedProxy: AuthenticatedProxy as AbiInfo,
 export const OpenseaABI = {
-    swapEx: OpenseaExSwap as AbiInfo,
+    swapEx: openseaExSwap as AbiInfo,
     proxyRegistry: proxyRegistryABI as AbiInfo,
     openseaExV2: exchangeABI as AbiInfo,
-    merkleValidator: merkleValidatorABI as AbiInfo
+    merkleValidator: merkleValidatorABI as AbiInfo,
+    assetContractShared: assetContractShared as AbiInfo
 }
 
 
@@ -81,7 +83,7 @@ export const OPENSEA_CONTRACTS_ADDRESSES: { [key: number]: any } = {
         'WyvernTokenTransferProxy': '0xe5c783ee536cf5e63e792988335c4255169be4e1',
         'GasToken': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
         'FeeRecipientAddress': '0x5b3256965e7c3cf26e11fcaf296dfc8807c01073',
-        'SharedAssetAddress': "0x495f947276749ce646f68ac8c248420045cb7b5e",
+        'AssetContractShared': "0x495f947276749ce646f68ac8c248420045cb7b5e",
         'ExchangeKeeper': "0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656"
 
     },
@@ -92,13 +94,20 @@ export const OPENSEA_CONTRACTS_ADDRESSES: { [key: number]: any } = {
         'WyvernTokenTransferProxy': '0xCdC9188485316BF6FA416d02B4F680227c50b89e',
         'GasToken': '0xc778417e063141139fce010982780140aa0cd5ab',
         'FeeRecipientAddress': '0x5b3256965e7c3cf26e11fcaf296dfc8807c01073',
-        'SharedAssetAddress': "0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656",
+        'AssetContractShared': "0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656",
+        'ExchangeKeeper': "0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656"
+    },
+    137: {//rinkeby
+        'MerkleProof': '0x45b594792a5cdc008d0de1c1d69faa3d16b3ddc1',
+        'WyvernExchange': '0xdD54D660178B28f6033a953b0E55073cFA7e3744',
+        'WyvernProxyRegistry': '0x1E525EEAF261cA41b809884CBDE9DD9E1619573A',
+        'WyvernTokenTransferProxy': '0xCdC9188485316BF6FA416d02B4F680227c50b89e',
+        'GasToken': '0xc778417e063141139fce010982780140aa0cd5ab',
+        'FeeRecipientAddress': '0x5b3256965e7c3cf26e11fcaf296dfc8807c01073',
+        'AssetContractShared': "0x2953399124f0cbb46d2cbacd8a89cf0599974963",
         'ExchangeKeeper': "0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656"
     }
 }
-// https://opensea.io/assets/0x495f947276749ce646f68ac8c248420045cb7b5e/105886420831251411528890303004419979784764244768332317573040781519418810171393
-
-//https://testnets.opensea.io/assets/0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656/105886420831251411528890303004419979784764244768332317573040781521617833426945
 
 export const ExSwap_CONTRACTS_ADDRESSES = {
     1: {
