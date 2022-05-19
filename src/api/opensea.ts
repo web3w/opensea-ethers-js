@@ -6,21 +6,19 @@ import QueryString from "querystring";
 import {AssetCollection, AssetOrdersQueryParams, AssetsQueryParams} from "../openseaEx/types";
 
 
-const ORDERBOOK_VERSION = 1
-const ORDERBOOK_PATH = `/wyvern/v${ORDERBOOK_VERSION}`
-
+const ORDERS_PATH = `/wyvern/v1`
 //has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
 const apiConfig = {
-    1: {
+    1: {//https://api.element.market/bridge/opensea
         apiBaseUrl: 'https://api.opensea.io',
         apiKey: '2f6f419a083c46de9d83ce3dbe7db601'
     },
     4: {
+        //https://api-test.element.market/bridge/opensea
         apiBaseUrl: 'https://testnets-api.opensea.io',
         apiKey: '2f6f419a083c46de9d83ce3dbe7db601'
     }
 }
-
 
 export class OpenseaAPI extends Fetch {
     constructor(
@@ -81,7 +79,7 @@ export class OpenseaAPI extends Fetch {
                 side: queryParams.side || 0,
                 order_by: queryParams.order_by || 'created_date'
             }
-            const json = await this.get(`${ORDERBOOK_PATH}/orders`, query, {
+            const json = await this.get(`${ORDERS_PATH}/orders`, query, {
                 headers: {
                     "X-API-KEY": this.apiKey
                 }
@@ -118,7 +116,7 @@ export class OpenseaAPI extends Fetch {
                 }
             }
             const result = await this.post(
-                `${ORDERBOOK_PATH}/orders/post`,
+                `${ORDERS_PATH}/orders/post`,
                 singSellOrder,
                 opts
             ).catch((e: any) => {

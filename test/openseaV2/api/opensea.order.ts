@@ -18,7 +18,7 @@ const seller = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
                 chainId,
                 address: seller,
                 priKey: secrets.accounts[seller]
-            }, {proxyUrl: 'http://127.0.0.1:7890', apiTimeout: 3200})
+            }, {proxyUrl: 'http://127.0.0.1:7890', apiTimeout: 10200})
 
             const sellAsset = asset721[chainId][1]
 
