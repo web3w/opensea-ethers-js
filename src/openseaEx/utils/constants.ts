@@ -1,4 +1,18 @@
 
+export const ORDERS_PATH = `/wyvern/v1`
+//has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+export const OPENSEA_API_CONFIG = {
+    1: {
+        apiBaseUrl: 'https://api.opensea.io',
+        apiKey: '2f6f419a083c46de9d83ce3dbe7db601'
+    },
+    4: {
+        //https://api-test.element.market/bridge/opensea
+        apiBaseUrl: 'https://testnets-api.opensea.io',
+        apiKey: '2f6f419a083c46de9d83ce3dbe7db601'
+    }
+}
+
 export const MAX_DIGITS_IN_UNSIGNED_256_INT = 78 // 78 solt
 
 export const DEFAULT_EXPIRATION_TIME = (86400 * 30); //1天= 86400 s
@@ -24,3 +38,6 @@ export const INVERSE_BASIS_POINT = 10000 //100%
 
 //static call
 export const STATIC_EXTRADATA = '0x0c225aad' //succeedIfTxOriginMatchesHardcodedAddress
+
+//Api Timeout
+export const OPENSEA_API_TIMEOUT = 5000 //2.5%

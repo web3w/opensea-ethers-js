@@ -68,12 +68,14 @@ export function tokenToMetadata(token: Token, quantity: string = "1", data?: str
             // const order = {...sellData, version: 0}
             const sellOrderStr = JSON.stringify(sellData)
 
+            const cancelOrderTx = await eleSDK.cancelOrders([sellOrderStr])
+            await cancelOrderTx.wait()
+
             const buyTx = await buySDK.acceptOrder(sellOrderStr)
             await buyTx.wait()
             console.log('Buy success', buyTx.hash)
 
-            const cancelOrderTx = await eleSDK.cancelOrders([sellOrderStr])
-            await cancelOrderTx.wait()
+
 
             // const order = await eleSDK.postOrder(sellOrderStr, {standard})
             // console.log(order.id || order)

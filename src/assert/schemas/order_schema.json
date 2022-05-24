@@ -1,72 +1,114 @@
 {
-    "id": "/orderSchema",
-    "properties": {
-        "makerAddress": {
-            "$ref": "/addressSchema"
-        },
-        "takerAddress": {
-            "$ref": "/addressSchema"
-        },
-        "makerFee": {
-            "$ref": "/wholeNumberSchema"
-        },
-        "takerFee": {
-            "$ref": "/wholeNumberSchema"
-        },
-        "senderAddress": {
-            "$ref": "/addressSchema"
-        },
-        "makerAssetAmount": {
-            "$ref": "/wholeNumberSchema"
-        },
-        "takerAssetAmount": {
-            "$ref": "/wholeNumberSchema"
-        },
-        "makerAssetData": {
-            "$ref": "/hexSchema"
-        },
-        "takerAssetData": {
-            "$ref": "/hexSchema"
-        },
-        "makerFeeAssetData": {
-            "$ref": "/hexSchema"
-        },
-        "takerFeeAssetData": {
-            "$ref": "/hexSchema"
-        },
-        "salt": {
-            "$ref": "/wholeNumberSchema"
-        },
-        "feeRecipientAddress": {
-            "$ref": "/addressSchema"
-        },
-        "expirationTimeSeconds": {
-            "$ref": "/wholeNumberSchema"
-        },
-        "chainId": {
-            "type": "number"
-        },
-        "exchangeAddress": {
-            "$ref": "/addressSchema"
-        }
+  "id": "/orderSchema",
+  "properties": {
+    "exchange": {
+      "$ref": "/addressSchema"
     },
-    "required": [
-        "makerAddress",
-        "takerAddress",
-        "makerFee",
-        "takerFee",
-        "senderAddress",
-        "makerAssetAmount",
-        "takerAssetAmount",
-        "makerAssetData",
-        "takerAssetData",
-        "makerFeeAssetData",
-        "takerFeeAssetData",
-        "salt",
-        "feeRecipientAddress",
-        "expirationTimeSeconds",
-        "chainId",
-        "exchangeAddress"
-    ],
-    "type": "object"
+    "maker": {
+      "$ref": "/addressSchema"
+    },
+    "taker": {
+      "$ref": "/addressSchema"
+    },
+    "makerRelayerFee": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "takerRelayerFee": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "makerProtocolFee": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "takerProtocolFee": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "makerReferrerFee": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "feeMethod": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "feeRecipient": {
+      "$ref": "/addressSchema"
+    },
+    "side": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "saleKind": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "target": {
+      "$ref": "/addressSchema"
+    },
+    "howToCall": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "dataToCall": {
+      "$ref": "/hexSchema"
+    },
+    "replacementPattern": {
+      "$ref": "/hexSchema"
+    },
+    "staticTarget": {
+      "$ref": "/addressSchema"
+    },
+    "staticExtradata": {
+      "$ref": "/hexSchema"
+    },
+    "paymentToken": {
+      "$ref": "/addressSchema"
+    },
+    "quantity": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "basePrice": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "extra": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "listingTime": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "expirationTime": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "salt": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "metadata": {
+      "$ref": "/metadataSchema"
+    },
+    "v": {
+      "$ref": "/wholeNumberSchema"
+    },
+    "r": {
+      "$ref": "/hexSchema"
+    },
+    "s": {
+      "$ref": "/hexSchema"
+    },
+    "hash": {
+      "$ref": "/hexSchema"
+    }
+  },
+  "required": [
+    "exchange",
+    "taker",
+    "maker",
+    "makerRelayerFee",
+    "senderAddress",
+    "makerAssetAmount",
+    "takerAssetAmount",
+    "makerAssetData",
+    "takerAssetData",
+    "makerFeeAssetData",
+    "takerFeeAssetData",
+    "salt",
+    "feeRecipientAddress",
+    "expirationTimeSeconds",
+    "chainId",
+    "exchangeAddress"
+  ],
+  "type": "object"
 }

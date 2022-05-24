@@ -10,15 +10,33 @@ import {AssetsQueryParams} from "element-sdk";
 const seller = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
 // const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 
+  const Test_API_CONFIG = {
+        1: {//https://api.element.market/bridge/opensea
+            apiBaseUrl: 'https://api.element.market/bridge/opensea',
+            apiKey: '2f6f419a083c46de9d83ce3dbe7db601',
+            proxyUrl: 'http://127.0.0.1:7890',
+            apiTimeout: 10200
+        },
+        4: {
+            //https://api-test.element.market/bridge/opensea
+            apiBaseUrl: 'https://api-test.element.market/bridge/opensea',
+            apiKey: '2f6f419a083c46de9d83ce3dbe7db601',
+            proxyUrl: 'http://127.0.0.1:7890',
+            apiTimeout: 10200
+        }
+    }
 
 ;(async () => {
         try {
+
             const chainId = 4
+            // const config = {proxyUrl: 'http://127.0.0.1:7890'}
+            const config = Test_API_CONFIG[chainId]
             const sellEx = new OpenseaExAgent({
                 chainId,
                 address: seller,
                 priKey: secrets.accounts[seller]
-            }, {proxyUrl: 'http://127.0.0.1:7890', apiTimeout: 10200})
+            }, config)
 
             const sellAsset = asset721[chainId][1]
 
@@ -36,11 +54,12 @@ const seller = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
             // })
             // console.log('success', foo)
 
-            // const query = {
-            //     asset_contract_address: sellAsset.tokenAddress, //
-            //     token_ids: [sellAsset.tokenId]
-            // } as AssetOrdersQueryParams
-            // const order = await sellEx.openseaApi.getAssetOrders(query)
+            const query = {
+                asset_contract_address: sellAsset.tokenAddress, //
+                token_ids: [sellAsset.tokenId]
+            } as AssetOrdersQueryParams
+            // const orders = await sellEx.openseaApi.getAssetOrders(query)
+            // console.log(orders)
 
             const assetsQuery = {
                 assets: [{

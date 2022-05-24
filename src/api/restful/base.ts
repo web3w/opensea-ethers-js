@@ -152,7 +152,7 @@ export class Fetch {
 
     private async _handleApiResponse(response: Response) {
         if (response.ok) {
-            this.logger(`Got success: ${response.status}`)
+            // this.logger(`Got success: ${response.status}`)
             return response
         }
 
@@ -165,7 +165,7 @@ export class Fetch {
             // Result will be undefined or text
         }
 
-        this.logger(`Got error ${response.status}: ${JSON.stringify(result)}`)
+        // this.logger(`Got error ${response.status}: ${JSON.stringify(result)}`)
 
         switch (response.status) {
             case 400:

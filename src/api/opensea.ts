@@ -4,22 +4,8 @@ import {orderToJSON} from "../openseaEx/utils/makeOrder";
 import {openseaOrderFromJSON} from "../openseaEx/utils/helper";
 import QueryString from "querystring";
 import {AssetCollection, AssetOrdersQueryParams, AssetsQueryParams} from "../openseaEx/types";
-
-
-const ORDERS_PATH = `/wyvern/v1`
-//has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
-const apiConfig = {
-    1: {//https://api.element.market/bridge/opensea
-        apiBaseUrl: 'https://api.opensea.io',
-        apiKey: '2f6f419a083c46de9d83ce3dbe7db601'
-    },
-    4: {
-        //https://api-test.element.market/bridge/opensea
-        apiBaseUrl: 'https://testnets-api.opensea.io',
-        apiKey: '2f6f419a083c46de9d83ce3dbe7db601'
-    }
-}
-
+import {OPENSEA_API_TIMEOUT, OPENSEA_API_CONFIG, ORDERS_PATH} from "../openseaEx/utils/constants";
+ 
 export class OpenseaAPI extends Fetch {
     constructor(
         wallet: WalletInfo,
@@ -27,11 +13,11 @@ export class OpenseaAPI extends Fetch {
     ) {
         super()
         const {chainId} = wallet
-        if (apiConfig[chainId]) {
-            this.apiBaseUrl = config?.apiBaseUrl || apiConfig[chainId].apiBaseUrl
-            this.apiKey = config?.authToken || apiConfig[chainId].apiKey
+        if (OPENSEA_API_CONFIG[chainId]) {
+            this.apiBaseUrl = config?.apiBaseUrl || OPENSEA_API_CONFIG[chainId].apiBaseUrl
+            this.apiKey = config?.authToken || OPENSEA_API_CONFIG[chainId].apiKey
             this.proxyUrl = config?.proxyUrl || ""
-            this.apiTimeout = config?.apiTimeout || 2000
+            this.apiTimeout = config?.apiTimeout || OPENSEA_API_TIMEOUT
         } else {
             throw 'OpenseaAPI unsport chainId:' + wallet.chainId
         }

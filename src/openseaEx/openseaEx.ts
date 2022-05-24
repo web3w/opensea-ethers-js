@@ -14,14 +14,13 @@ import {
     Token,
     APIConfig,
     OrderType,
-    RPC_PUB_PROVIDER,
     NULL_ADDRESS, Asset, NULL_BLOCK_HASH, ElementSchemaName,
     BuyOrderParams,
     CreateOrderParams,
     LimitedCallSpec,
     MatchParams,
     SellOrderParams,
-    NullToken
+    NullToken, getChainRpcUrl
 } from 'web3-wallets'
 import {Contract, ethers} from "ethers";
 import {Order, OrderJSON, UnhashedOrder} from "./types";
@@ -36,10 +35,7 @@ import {
 import {ElementError} from "./utils/error";
 import {metadataToAsset, getWyvOrderParams, getEIP712TypedData} from "./utils/helper";
 import {DEFAULT_EXPIRATION_TIME, DEFAULT_LISTING_TIME, DEFAULT_SELLER_FEE_BASIS_POINTS} from "./utils/constants";
-import assetContractShared from "../contracts/abi/openseaV2/AssetContractShared.json";
 
-
-const RPC_PROVIDER = RPC_PUB_PROVIDER
 
 export class OpenseaEx extends EventEmitter {
     public walletInfo: WalletInfo
@@ -301,12 +297,6 @@ export class OpenseaEx extends EventEmitter {
             console.log(tx.hash)
         }
 
-        if (!assetApprove.isApprove) {
-            const tx = await ethSend(this.walletInfo, assetApprove.calldata)
-            await tx.wait()
-            console.log(tx.hash)
-        }
-
         if (paymentToken.address != NULL_ADDRESS && !tokenApprove.isApprove) {
             const tx = await ethSend(this.walletInfo, tokenApprove.calldata)
             await tx.wait()
@@ -448,9 +438,10 @@ export class OpenseaEx extends EventEmitter {
     public async checkMatchOrder(orderStr: string) {
         const {orderParm, orderJson} = getWyvOrderParams(orderStr)
         const orderHash = await this.exchange.hashToSign_(...orderParm)
+        if (!orderJson.calldata) throw 'The order has no CallData definition'
         // 检查订单是否被批量取消-
         if (orderJson.hash !== orderHash) {
-            throw new ElementError({code: '1213', data: orderStr})
+            throw 'The order has been filled or cancelled'
         }
 
         // 检查订单是否有效
@@ -625,7 +616,7 @@ export class OpenseaEx extends EventEmitter {
         await this.checkMatchOrder(orderStr)
         const {callData, sell} = await this.getMatchCallData({orderStr})
         console.assert(sell.exchange.toLowerCase() == this.exchange.address.toLowerCase(), 'AcceptOrder error')
-        const rpcUrl = this.walletInfo.rpcUrl = RPC_PROVIDER[this.walletInfo.chainId]
+        const rpcUrl = this.walletInfo.rpcUrl = await getChainRpcUrl(this.walletInfo.chainId)
         const gas = await getEstimateGas(rpcUrl, callData).catch(async (err: any) => {
             console.log(err)
             throw err
@@ -654,7 +645,7 @@ export class OpenseaEx extends EventEmitter {
             to: data.to,
             data: data.data
         } as LimitedCallSpec
-        const rpcUrl = this.walletInfo.rpcUrl || RPC_PROVIDER[this.walletInfo.chainId]
+        const rpcUrl = this.walletInfo.rpcUrl || await getChainRpcUrl(this.walletInfo.chainId)
         const gas = await getEstimateGas(rpcUrl, callData)
         // console.log(gas)
         return ethSend(this.walletInfo, callData)
@@ -668,7 +659,7 @@ export class OpenseaEx extends EventEmitter {
             to: this.exchange.options.address,
             data: data.data
         } as LimitedCallSpec
-        const rpcUrl = this.walletInfo.rpcUrl || RPC_PROVIDER[this.walletInfo.chainId]
+        const rpcUrl = this.walletInfo.rpcUrl || await getChainRpcUrl(this.walletInfo.chainId)
         await getEstimateGas(rpcUrl, callData)
         return ethSend(this.walletInfo, callData)
     }
@@ -688,7 +679,8 @@ export class OpenseaEx extends EventEmitter {
     }
 
     async estimateGas(callData: LimitedCallSpec) {
-        return getEstimateGas(this.walletInfo.rpcUrl || RPC_PROVIDER[this.walletInfo.chainId], callData).catch(err => {
+        const rpcUrl = this.walletInfo.rpcUrl || await getChainRpcUrl(this.walletInfo.chainId)
+        return getEstimateGas(rpcUrl, callData).catch(err => {
             throw err
         })
     }

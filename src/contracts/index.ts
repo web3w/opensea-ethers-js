@@ -3,7 +3,7 @@ import proxyRegistryABI from './abi/openseaV2/WyvernProxyRegistry.json'
 import exchangeABI from './abi/openseaV2/WyvernExchange.json'
 import merkleValidatorABI from './abi/openseaV2/MerkleValidator.json'
 import assetContractShared from './abi/openseaV2/AssetContractShared.json'
-import openseaExSwap from './abi/aggtrade/OpenseaExSwap.json'
+import exSwap from './abi/aggtrade/ExSwap.json'
 
 export interface AbiInfo {
     contractName: string
@@ -13,11 +13,14 @@ export interface AbiInfo {
 
 // authenticatedProxy: AuthenticatedProxy as AbiInfo,
 export const OpenseaABI = {
-    swapEx: openseaExSwap as AbiInfo,
     proxyRegistry: proxyRegistryABI as AbiInfo,
     openseaExV2: exchangeABI as AbiInfo,
     merkleValidator: merkleValidatorABI as AbiInfo,
     assetContractShared: assetContractShared as AbiInfo
+}
+
+export const ContractABI = {
+    swapEx: exSwap as AbiInfo
 }
 
 
@@ -109,7 +112,7 @@ export const OPENSEA_CONTRACTS_ADDRESSES: { [key: number]: any } = {
     }
 }
 
-export const ExSwap_CONTRACTS_ADDRESSES = {
+export const EXSWAP_CONTRACTS_ADDRESSES = {
     1: {
         ExSwap: "0x69Cf8871F61FB03f540bC519dd1f1D4682Ea0bF6",
         0: '0x7f268357A8c2552623316e2562D90e642bB538E5', // opensea
