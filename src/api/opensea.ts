@@ -5,7 +5,7 @@ import {openseaOrderFromJSON} from "../openseaEx/utils/helper";
 import QueryString from "querystring";
 import {AssetCollection, AssetOrdersQueryParams, AssetsQueryParams} from "../openseaEx/types";
 import {OPENSEA_API_TIMEOUT, OPENSEA_API_CONFIG, ORDERS_PATH} from "../openseaEx/utils/constants";
- 
+
 export class OpenseaAPI extends Fetch {
     constructor(
         wallet: WalletInfo,
@@ -94,7 +94,6 @@ export class OpenseaAPI extends Fetch {
         // singSellOrder.calldata = singSellOrder.dataToCall
         // singSellOrder.nonce = singSellOrder.nonce.toString()
         // delete singSellOrder.dataToCall
-
         try {
             const opts = {
                 headers: {

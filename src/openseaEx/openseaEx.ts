@@ -309,6 +309,7 @@ export class OpenseaEx extends EventEmitter {
         const accountAddress = this.walletInfo.address
         const sellOrderParams = {
             exchangeAddr,
+            protocolFeePoint:this.protocolFeePoint,
             asset,
             quantity,
             accountAddress,
@@ -362,6 +363,7 @@ export class OpenseaEx extends EventEmitter {
         expirationTime = expirationTime ? parseInt(String(expirationTime)) : DEFAULT_LISTING_TIME + DEFAULT_EXPIRATION_TIME;
         const buyOrderParams = {
             exchangeAddr,
+            protocolFeePoint:this.protocolFeePoint,
             asset,
             quantity,
             accountAddress,

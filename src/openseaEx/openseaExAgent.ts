@@ -26,15 +26,13 @@ export class OpenseaExAgent extends EventEmitter implements ExAgent {
 
     constructor(wallet: WalletInfo, config?: APIConfig) {
         super()
-        const {chainId, address} = wallet
+        const {chainId} = wallet
         let conf: APIConfig = {chainId}
         if (config) {
             conf = config
         }
-        // const {walletProvider} = getProvider(wallet)
         this.contracts = new OpenseaEx(wallet, conf)
         this.openseaApi = new OpenseaAPI(wallet, conf)
-        // this.walletProvider = walletProvider
         this.walletInfo = wallet
     }
 

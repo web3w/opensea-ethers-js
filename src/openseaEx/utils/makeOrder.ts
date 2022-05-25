@@ -13,7 +13,6 @@ import {
 import {ElementError} from './error'
 import {_getBuyFeeParameters, _getSellFeeParameters, computeFees} from './fees'
 import {
-    MAX_DIGITS_IN_UNSIGNED_256_INT,
     MIN_EXPIRATION_SECONDS,
     ORDER_MATCHING_LATENCY_SECONDS,
     STATIC_EXTRADATA
@@ -175,6 +174,7 @@ export function getTimeParameters(
 
 export async function _makeBuyOrder({
                                         exchangeAddr,
+                                        protocolFeePoint,
                                         asset,
                                         quantity,
                                         accountAddress,
@@ -187,6 +187,7 @@ export async function _makeBuyOrder({
                                         offerType
                                     }: {
     exchangeAddr: string
+    protocolFeePoint:number
     asset: Asset
     quantity: number
     accountAddress: string
@@ -219,6 +220,7 @@ export async function _makeBuyOrder({
     // -------- Fee -----------
     const {totalBuyerFeeBasisPoints, totalSellerFeeBasisPoints} = await computeFees({
         asset: asset,
+        protocolFeePoint,
         extraBountyBasisPoints,
         side: OrderType.Buy
     })
@@ -277,6 +279,7 @@ export async function _makeBuyOrder({
 
 export async function _makeSellOrder({
                                          exchangeAddr,
+                                         protocolFeePoint,
                                          asset,
                                          quantity,
                                          accountAddress,
@@ -292,6 +295,7 @@ export async function _makeSellOrder({
                                          buyerAddress
                                      }: {
     exchangeAddr: string
+    protocolFeePoint:number
     asset: Asset
     quantity: number
     accountAddress: string
@@ -331,6 +335,7 @@ export async function _makeSellOrder({
     const isPrivate = buyerAddress != NULL_ADDRESS
     const {totalSellerFeeBasisPoints, totalBuyerFeeBasisPoints, sellerBountyBasisPoints} = await computeFees({
         asset,
+        protocolFeePoint,
         side: OrderType.Sell,
         isPrivate,
         extraBountyBasisPoints
