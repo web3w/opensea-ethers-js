@@ -1,4 +1,4 @@
-import {SellOrderParams} from "web3-wallets";
+import {SellOrderParams} from "web3-accounts";
 
 import * as secrets from '../../../../secrets.json'
 import {OpenseaAPI} from "../../../src/api/opensea";

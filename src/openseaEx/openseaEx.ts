@@ -6,24 +6,30 @@ import {
 } from '../contracts/index'
 
 import {
-    ethSend,
-    getEstimateGas,
-    WalletInfo,
-    UserAccount,
-    BigNumber,
+    Web3Accounts,
     Token,
     APIConfig,
     OrderType,
-    NULL_ADDRESS, Asset, NULL_BLOCK_HASH, ElementSchemaName,
+    Asset, TokenSchemaName,
     BuyOrderParams,
     CreateOrderParams,
-    LimitedCallSpec,
     MatchParams,
     SellOrderParams,
-    NullToken, getChainRpcUrl
-} from 'web3-wallets'
+    NullToken,
+} from 'web3-accounts'
+import {
+    Order, OrderJSON, UnhashedOrder,
+    ethSend,
+    getEstimateGas,
+    WalletInfo,
+    getChainRpcUrl,
+    NULL_BLOCK_HASH,
+    NULL_ADDRESS,
+    LimitedCallSpec,
+    BigNumber
+} from "./types"
 import {Contract, ethers} from "ethers";
-import {Order, OrderJSON, UnhashedOrder} from "./types";
+
 import {
     _makeBuyOrder,
     _makeMatchingOrder,
@@ -54,7 +60,7 @@ export class OpenseaEx extends EventEmitter {
     public exchangeProxyRegistry: Contract
     public assetShared: Contract
 
-    public userAccount: UserAccount
+    public userAccount: Web3Accounts
 
     public GasWarpperToken: Token
 
@@ -93,7 +99,7 @@ export class OpenseaEx extends EventEmitter {
         this.exchangeKeeper = contracts.ExchangeKeeper
 
 
-        this.userAccount = new UserAccount(wallet)
+        this.userAccount = new Web3Accounts(wallet)
         const options = this.userAccount.signer
         if (exchangeAddr && proxyRegistryAddr) {
             this.exchangeProxyRegistry = new ethers.Contract(proxyRegistryAddr, OpenseaABI.proxyRegistry.abi, options)
@@ -309,7 +315,7 @@ export class OpenseaEx extends EventEmitter {
         const accountAddress = this.walletInfo.address
         const sellOrderParams = {
             exchangeAddr,
-            protocolFeePoint:this.protocolFeePoint,
+            protocolFeePoint: this.protocolFeePoint,
             asset,
             quantity,
             accountAddress,
@@ -363,7 +369,7 @@ export class OpenseaEx extends EventEmitter {
         expirationTime = expirationTime ? parseInt(String(expirationTime)) : DEFAULT_LISTING_TIME + DEFAULT_EXPIRATION_TIME;
         const buyOrderParams = {
             exchangeAddr,
-            protocolFeePoint:this.protocolFeePoint,
+            protocolFeePoint: this.protocolFeePoint,
             asset,
             quantity,
             accountAddress,
@@ -520,7 +526,7 @@ export class OpenseaEx extends EventEmitter {
         let dataToCall = "", replacementPattern = ""
 
         //ok https://rinkeby.etherscan.io/tx/0x1a9ab7ba090f62460a2157187578ba7698cadd9d48a430cadc2da785e890c0b8
-        if (order.metadata.schema == ElementSchemaName.ERC721) {
+        if (order.metadata.schema == TokenSchemaName.ERC721) {
             // const gas = await this.contracts.merkleValidator.estimateGas.matchERC721UsingCriteria(from, to, token, tokenId, root, proof)
 
             if (order.side == OrderType.Sell) {
@@ -538,7 +544,7 @@ export class OpenseaEx extends EventEmitter {
             }
         }
 
-        if (order.metadata.schema == ElementSchemaName.ERC1155) {
+        if (order.metadata.schema == TokenSchemaName.ERC1155) {
 
             if (order.side == OrderType.Sell) {
                 const callData = await this.merkleValidator.populateTransaction.matchERC1155UsingCriteria(from, NULL_ADDRESS, token, tokenId, amount, root, proof)

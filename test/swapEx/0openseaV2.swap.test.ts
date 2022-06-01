@@ -1,7 +1,7 @@
 import * as secrets from '../../../secrets.json'
 import {SwapEx} from "../../src/swapEx/swapEx";
 import {OpenseaExAgent} from "../../lib";
-import {SellOrderParams} from "web3-wallets";
+import {SellOrderParams} from "web3-accounts";
 
 const rpcUrl = 'https://api-test.element.market/api/v1/jsonrpc'
 const seller = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'

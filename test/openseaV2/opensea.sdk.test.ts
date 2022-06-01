@@ -1,7 +1,8 @@
 import * as secrets from '../../../secrets.json'
 import {assetToMetadata} from "../../src/openseaEx/utils/helper";
 import {OpenseaEx} from "../../src/openseaEx/openseaEx";
-import {UserAccount, Asset, SellOrderParams} from "web3-wallets";
+import {Web3Accounts, Asset, SellOrderParams} from "web3-accounts";
+import {asset721} from "../assets";
 
 
 const buyer = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
@@ -23,11 +24,7 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
                 address: buyer,
                 priKey: secrets.accounts[buyer]
             })
-            const sellAsset = {
-                tokenId: '203089',//
-                tokenAddress: '0x5fecbbbaf9f3126043a48a35eb2eb8667d469d53',
-                schemaName: 'ERC721'
-            } as Asset;
+            const sellAsset = asset721[chainId][0] as Asset
 
             const sellBal = await eleEx.userAccount.getAssetBalances(sellAsset)
             const buyerBal = await eleEx.userAccount.getAssetBalances(sellAsset, buyer)
@@ -35,7 +32,7 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
                 throw 'Asset balance 0'
             }
             if (Number(buyerBal) > Number(sellBal)) {
-                const buyerSDK = new UserAccount({
+                const buyerSDK = new Web3Accounts({
                     chainId,
                     address: buyer,
                     priKey: secrets.accounts[buyer]

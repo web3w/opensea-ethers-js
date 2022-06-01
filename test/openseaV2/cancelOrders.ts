@@ -1,5 +1,5 @@
 import * as secrets from '../../../secrets.json'
-import {Asset, assetToMetadata, ExchangeMetadata, LowerPriceOrderParams, SellOrderParams, Token} from "web3-wallets";
+import {Asset, assetToMetadata, ExchangeMetadata, LowerPriceOrderParams, SellOrderParams, Token} from "web3-accounts";
 
 import {asset721, erc20Tokens} from "../assets";
 import {OpenseaEx} from "../../src/openseaEx/openseaEx";
@@ -57,7 +57,7 @@ export function tokenToMetadata(token: Token, quantity: string = "1", data?: str
             const assetApp = await eleAgent.getAssetApprove([assetMeta])
             const tokenMata = tokenToMetadata(token, "0.03")
             const tokenApp = await eleAgent.getAssetApprove([tokenMata])
-            console.log(tokenApp)
+            // console.log(tokenApp)
 
             const buyParams = {
                 asset,

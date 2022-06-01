@@ -15,10 +15,11 @@ import {_getBuyFeeParameters, _getSellFeeParameters, computeFees} from './fees'
 import {
     MIN_EXPIRATION_SECONDS,
     ORDER_MATCHING_LATENCY_SECONDS,
-    STATIC_EXTRADATA
+    STATIC_EXTRADATA,
+    NULL_ADDRESS
 } from './constants'
 import {makeBigNumber, toBaseUnitAmount} from './helper'
-import {OfferType, OrderType,NULL_ADDRESS,MetaAsset} from "web3-wallets";
+import {OfferType, OrderType, MetaAsset} from "web3-accounts";
 
 
 // export enum OfferType {
@@ -187,7 +188,7 @@ export async function _makeBuyOrder({
                                         offerType
                                     }: {
     exchangeAddr: string
-    protocolFeePoint:number
+    protocolFeePoint: number
     asset: Asset
     quantity: number
     accountAddress: string
@@ -295,7 +296,7 @@ export async function _makeSellOrder({
                                          buyerAddress
                                      }: {
     exchangeAddr: string
-    protocolFeePoint:number
+    protocolFeePoint: number
     asset: Asset
     quantity: number
     accountAddress: string

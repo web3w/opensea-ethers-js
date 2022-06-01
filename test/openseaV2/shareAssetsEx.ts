@@ -1,6 +1,6 @@
 import {asset1155Share} from "../assets";
 import BigNumber from "bignumber.js";
-import {SellOrderParams, Asset,} from "web3-wallets";
+import {SellOrderParams, Asset,} from "web3-accounts";
 import * as secrets from '../../../secrets.json'
 import {ethers} from "ethers";
 import {OpenseaEx} from "../../index";

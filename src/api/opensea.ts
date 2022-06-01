@@ -1,9 +1,14 @@
 import {Fetch, Sleep} from "./restful/base";
-import {APIConfig, OrderType, WalletInfo} from "web3-wallets";
 import {orderToJSON} from "../openseaEx/utils/makeOrder";
 import {openseaOrderFromJSON} from "../openseaEx/utils/helper";
 import QueryString from "querystring";
-import {AssetCollection, AssetOrdersQueryParams, AssetsQueryParams} from "../openseaEx/types";
+import {
+    AssetCollection,
+    AssetOrdersQueryParams,
+    AssetsQueryParams,
+    APIConfig,
+    WalletInfo
+} from "../openseaEx/types";
 import {OPENSEA_API_TIMEOUT, OPENSEA_API_CONFIG, ORDERS_PATH} from "../openseaEx/utils/constants";
 
 export class OpenseaAPI extends Fetch {

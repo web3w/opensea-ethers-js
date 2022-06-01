@@ -1,25 +1,25 @@
 import EventEmitter from 'events'
 
 import {
-    BigNumber,
     BuyOrderParams,
     CreateOrderParams,
     APIConfig,
-    ElementSchemaName,
-    ExAgent,
-    ExchangeMetadata, LimitedCallSpec,
+    TokenSchemaName,
+    ExchangetAgent,
+    ExchangeMetadata,
     LowerPriceOrderParams,
     MatchParams,
-    metadataToAsset, NULL_ADDRESS,
+    metadataToAsset,
     OrderType,
-    SellOrderParams,
-    WalletInfo
-} from "web3-wallets"
+    SellOrderParams
+} from "web3-accounts"
+
+import {WalletInfo, LimitedCallSpec, BigNumber,NULL_ADDRESS} from "./types"
 
 import {OpenseaEx} from "./openseaEx";
 import {OpenseaAPI} from "../api/opensea";
 
-export class OpenseaExAgent extends EventEmitter implements ExAgent {
+export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
     public contracts: OpenseaEx
     public walletInfo: WalletInfo
     public openseaApi: OpenseaAPI
@@ -56,7 +56,7 @@ export class OpenseaExAgent extends EventEmitter implements ExAgent {
             const {address, quantity} = asset
             if (!quantity) throw 'Asset quantity is undefined'
 
-            if (schema == ElementSchemaName.ERC20) {
+            if (schema == TokenSchemaName.ERC20) {
                 const {allowance, balances, calldata} = await this.contracts.getTokenProxyApprove(address)
                 const spend = new BigNumber(quantity).times(new BigNumber(10).pow(decimals || 18))
                 // if (spend.gt(balances)) {
@@ -67,7 +67,7 @@ export class OpenseaExAgent extends EventEmitter implements ExAgent {
                     balances,
                     calldata: spend.lte(allowance) ? undefined : calldata
                 })
-            } else if (schema == ElementSchemaName.ERC721 || schema == ElementSchemaName.ERC1155) {
+            } else if (schema == TokenSchemaName.ERC721 || schema == TokenSchemaName.ERC1155) {
                 const data = await this.contracts.getAssetProxyApprove(metaAsset)
                 assetApprove.push(data)
             }

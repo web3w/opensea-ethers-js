@@ -160,8 +160,10 @@ export class Fetch {
         let errorMessage
         try {
             result = await response.text()
+            console.log(result)
             result = JSON.parse(result)
-        } catch {
+        } catch (error: any) {
+            console.error('_handleApiResponse', error)
             // Result will be undefined or text
         }
 

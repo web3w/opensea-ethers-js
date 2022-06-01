@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
-import { Contract, ethers } from 'ethers'
-import { OpenseaExAgent } from '../openseaEx/openseaExAgent'
+import {Contract, ethers} from 'ethers'
+import {OpenseaExAgent} from '../openseaEx/openseaExAgent'
 import {
     EXSWAP_CONTRACTS_ADDRESSES,
     ContractABI
@@ -8,9 +8,11 @@ import {
 
 
 import {
-    ethSend, ElementSchemaName, LimitedCallSpec,
-    WalletInfo, getEstimateGas, UserAccount, APIConfig, CHAIN_CONFIG, getChainRpcUrl
+    ethSend, TokenSchemaName, LimitedCallSpec,
+    WalletInfo, getEstimateGas, CHAIN_CONFIG, getChainRpcUrl
 } from 'web3-wallets'
+
+import {Web3Accounts} from "web3-accounts"
 
 export interface SimpleTrades {
     value: string
@@ -37,7 +39,7 @@ export interface ExSwapTradeData {
     tokenId: string
     value: string
     orderHash: string
-    schema: ElementSchemaName
+    schema: TokenSchemaName
 }
 
 
@@ -77,7 +79,7 @@ function getValidSwaps(intData: number, swaps: Array<TradeDetails>) {
             swap: val
         }
     })
-    return { swapIsValid, swaps: swapValid, value: allValue.toString(), bData }
+    return {swapIsValid, swaps: swapValid, value: allValue.toString(), bData}
 }
 
 function getSwapsValue(swaps: Array<TradeDetails>) {
@@ -91,13 +93,13 @@ function getSwapsValue(swaps: Array<TradeDetails>) {
 export class SwapEx extends EventEmitter {
     public swapExContract: Contract
     public walletInfo: WalletInfo
-    public userAccount: UserAccount
+    public userAccount: Web3Accounts
     public contractAddr
 
     constructor(wallet: WalletInfo) {
         super()
-        this.walletInfo = { ...wallet, rpcUrl: CHAIN_CONFIG[wallet.chainId].rpcs[0] }
-        this.userAccount = new UserAccount(wallet)
+        this.walletInfo = {...wallet, rpcUrl: CHAIN_CONFIG[wallet.chainId].rpcs[0]}
+        this.userAccount = new Web3Accounts(wallet)
         const contractAddr = EXSWAP_CONTRACTS_ADDRESSES[this.walletInfo.chainId]
         if (!contractAddr) throw 'ElementExSwap config error ' + this.walletInfo.chainId
         this.swapExContract = new ethers.Contract(contractAddr.ExSwap, ContractABI.swapEx.abi, this.userAccount.signer)
@@ -105,7 +107,7 @@ export class SwapEx extends EventEmitter {
     }
 
     public async batchBuyWithETHSimulate(swaps: Array<TradeDetails>): Promise<any> {
-        if (swaps.length == 0) return { swaps: [], value: '0' }// throw 'BatchBuyWithETHSimulate swaps is null'
+        if (swaps.length == 0) return {swaps: [], value: '0'}// throw 'BatchBuyWithETHSimulate swaps is null'
         // if (swaps.find(val => !val.tradeData) || swaps.find(val => !val.value)) throw 'BatchBuyWithETHSimulate swaps tradeData or value is undefined'
         for (const val of swaps) {
             if (!val.tradeData || !val.value) throw 'BatchBuyWithETHSimulate swaps tradeData or value is undefined'
@@ -122,7 +124,7 @@ export class SwapEx extends EventEmitter {
         }
         const value = getSwapsValue(swaps)
         return new Promise(async (resolve, reject) => {
-            const callData = await this.swapExContract.populateTransaction.batchBuyWithETHSimulate(swaps, { value })
+            const callData = await this.swapExContract.populateTransaction.batchBuyWithETHSimulate(swaps, {value})
             const rpcUrl = await getChainRpcUrl(this.walletInfo.chainId)
             return getEstimateGas(rpcUrl, {
                 ...callData,
@@ -159,7 +161,7 @@ export class SwapEx extends EventEmitter {
                 makerAddress: this.swapExContract.address,
                 assetRecipientAddress: this.walletInfo.address
             }
-            const { callData } = await openseaEx.getMatchCallData(params)
+            const {callData} = await openseaEx.getMatchCallData(params)
             console.log('buyOneOpenSeaWithETH', callData.value)
             tradeDatas.push(<TradeDetails>{
                 marketId,
@@ -179,7 +181,7 @@ export class SwapEx extends EventEmitter {
             makerAddress: this.swapExContract.address,
             assetRecipientAddress: this.walletInfo.address
         }
-        const { callData } = await openseaEx.getMatchCallData(params)
+        const {callData} = await openseaEx.getMatchCallData(params)
         console.log('buyOneOpenSeaWithETH', callData.value)
 
         const value = ethers.BigNumber.from(callData.value)
@@ -189,8 +191,8 @@ export class SwapEx extends EventEmitter {
             value: value.toString(),
             tradeData: callData.data
         }
-        const tx = await this.swapExContract.populateTransaction.buyOneWithETH(marketProxy, tradeDetail, { value })
-        const buyOneCallData = { ...tx, value: tx.value?.toString() } as LimitedCallSpec
+        const tx = await this.swapExContract.populateTransaction.buyOneWithETH(marketProxy, tradeDetail, {value})
+        const buyOneCallData = {...tx, value: tx.value?.toString()} as LimitedCallSpec
         await getEstimateGas(this.walletInfo.rpcUrl || '', buyOneCallData)
 
         const tradeData = <TradeDetails>{
@@ -209,8 +211,8 @@ export class SwapEx extends EventEmitter {
             value: swap.value,
             tradeData: swap.tradeData
         }
-        const tx = await this.swapExContract.populateTransaction.buyOneWithETH(marketProxy, tradeDetail, { value })
-        const callData = { ...tx, value: tx.value?.toString() } as LimitedCallSpec
+        const tx = await this.swapExContract.populateTransaction.buyOneWithETH(marketProxy, tradeDetail, {value})
+        const callData = {...tx, value: tx.value?.toString()} as LimitedCallSpec
         return ethSend(this.walletInfo, callData)
     }
 
@@ -226,8 +228,8 @@ export class SwapEx extends EventEmitter {
         })
         // return this.swapExContract.batchBuyFromSingleMarketWithETH(marketProxy, tradeDetails, {value})
 
-        const tx = await this.swapExContract.populateTransaction.batchBuyFromSingleMarketWithETH(marketProxy, tradeDetails, { value })
-        const callData = { ...tx, value: tx.value?.toString() } as LimitedCallSpec
+        const tx = await this.swapExContract.populateTransaction.batchBuyFromSingleMarketWithETH(marketProxy, tradeDetails, {value})
+        const callData = {...tx, value: tx.value?.toString()} as LimitedCallSpec
         return ethSend(this.walletInfo, callData)
         // console.log("batchBuyFromSingleMarketWithETH", swaps.length, callData.value)
         // swaps.map(val => {
@@ -239,8 +241,8 @@ export class SwapEx extends EventEmitter {
 
     public async batchBuyWithETH(swaps: Array<TradeDetails>) {
         const value = getSwapsValue(swaps)
-        const tx = await this.swapExContract.populateTransaction.batchBuyWithETH(swaps, { value })
-        const callData = { ...tx, value: tx.value?.toString() } as LimitedCallSpec
+        const tx = await this.swapExContract.populateTransaction.batchBuyWithETH(swaps, {value})
+        const callData = {...tx, value: tx.value?.toString()} as LimitedCallSpec
         return ethSend(this.walletInfo, callData)
 
         // console.log("batchBuyWithETH", swaps.length, callData.value)

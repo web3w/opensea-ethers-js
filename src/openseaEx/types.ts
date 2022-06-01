@@ -2,16 +2,30 @@ import {
     Asset,
     Token,
     OfferType,
-    ElementSchemaName,
+    TokenSchemaName,
     OrderType,
     ExchangeMetadata,
-    NULL_ADDRESS,
+    APIConfig
+} from "web3-accounts"
+import {BigNumber} from 'web3-wallets'
+
+export {
+    NULL_BLOCK_HASH,
+    NULL_ADDRESS, getProvider, getEstimateGas,
+    ethSend,
     BigNumber,
-} from "web3-wallets"
+    ETH_TOKEN_ADDRESS,
+    CHAIN_CONFIG,
+    getChainRpcUrl,
+    hexUtils,
+    getEIP712DomainHash,
+    createEIP712TypedData
+} from 'web3-wallets'
+export type {Signature, WalletInfo, LimitedCallSpec, EIP712TypedData, EIP712Domain} from 'web3-wallets'
 
 
-export {ElementSchemaName, BigNumber, NULL_ADDRESS, OrderType}
-export type {Asset, Token, ExchangeMetadata}
+export {TokenSchemaName, OrderType}
+export type {Asset, Token, APIConfig, ExchangeMetadata}
 
 export interface AssetOrdersQueryParams {
     token_ids: string[]

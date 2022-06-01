@@ -1,4 +1,4 @@
-import {SellOrderParams} from "web3-wallets";
+import {SellOrderParams} from "web3-accounts";
 
 import * as secrets from '../../../../secrets.json'
 import {AssetOrdersQueryParams} from "../../../src/openseaEx/types";
@@ -31,7 +31,7 @@ const seller = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
         try {
 
             const chainId = 4
-            // const config = {proxyUrl: 'http://127.0.0.1:7890'}
+            // const config = {proxyUrl: 'http://127.0.0.1:7890',protocolFeePoint:2}
             const config = Test_API_CONFIG[chainId]
             const sellEx = new OpenseaExAgent({
                 chainId,

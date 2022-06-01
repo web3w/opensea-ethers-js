@@ -1,10 +1,10 @@
-import {ElementSchemaName} from "web3-wallets";
+import {TokenSchemaName} from "web3-accounts";
 
 export const CryptoKitties = {
     4: [{
         tokenId: '16',
         tokenAddress: '0x1530272ce6e4589f5c09151a7c9a118a58d70e09',
-        schemaName: ElementSchemaName.CryptoKitties
+        schemaName: TokenSchemaName.CryptoKitties
     }]
 }
 
@@ -28,16 +28,16 @@ export const asset721 = {
         {
             tokenId: '9',
             tokenAddress: '0xb556f251eacbec4badbcddc4a146906f2c095bee',
-            schemaName: ElementSchemaName.ERC721
+            schemaName: TokenSchemaName.ERC721
         },
         {
             tokenId: '1',
             tokenAddress: '0x323ce7344EeecfCe716720599cE7689930D25119',
-            schemaName: ElementSchemaName.ERC721
+            schemaName: TokenSchemaName.ERC721
         }, {
             tokenId: '17',
             tokenAddress: '0x2d0c5c5a495134e53ea65c94c4e07f45731f7201',
-            schemaName: ElementSchemaName.ERC721
+            schemaName: TokenSchemaName.ERC721
         }],
     97: [
         {

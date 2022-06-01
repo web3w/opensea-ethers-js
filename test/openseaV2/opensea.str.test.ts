@@ -1,6 +1,6 @@
 import * as secrets from '../../../secrets.json'
 import {OpenseaEx} from "../../src/openseaEx/openseaEx";
-import {ETHToken, SellOrderParams} from "web3-wallets";
+import {ETHToken, SellOrderParams} from "web3-accounts";
 import {ExSchemaName} from "element-sdk";
 
 const rpcUrl = 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
