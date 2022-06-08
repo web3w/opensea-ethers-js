@@ -16,13 +16,13 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
             const eleEx = new OpenseaEx({
                 chainId,
                 address: seller,
-                priKey: secrets.accounts[seller]
+                privateKeys: secrets.privateKeys
             },)
 
             const buyerSdk = new OpenseaEx({
                 chainId,
                 address: buyer,
-                priKey: secrets.accounts[buyer]
+                privateKeys: secrets.privateKeys
             })
             const sellAsset = asset721[chainId][0] as Asset
 
@@ -35,7 +35,7 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
                 const buyerSDK = new Web3Accounts({
                     chainId,
                     address: buyer,
-                    priKey: secrets.accounts[buyer]
+                    privateKeys: secrets.privateKeys
                 });
                 const metadata = assetToMetadata(sellAsset, "1")
                 const tx = await buyerSDK.assetTransfer(metadata, seller)

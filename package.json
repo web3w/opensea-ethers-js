@@ -1,6 +1,6 @@
 {
   "name": "opensea-ethers-js",
-  "version": "1.1.19",
+  "version": "1.1.20",
   "description": "Javascript SDK for the OpenSea Market ",
   "main": "lib/index.js",
   "type": "lib/index.d.ts",
@@ -23,10 +23,12 @@
     "jsonschema": "^1.4.1",
     "node-fetch": "^2.6.7",
     "query-string": "^7.1.1",
-    "web3-accounts": "1.1.0",
-    "web3-wallets": "^2.0.5"
+    "web3-accounts": "1.1.15",
+    "web3-wallets": "^2.0.10"
   },
   "devDependencies": {
+    "tls": "^0.0.1",
+    "net": "^1.0.2",
     "@babel/preset-react": "^7.16.7",
     "@ensdomains/ensjs": "^2.1.0",
     "@types/chai": "^4.3.0",

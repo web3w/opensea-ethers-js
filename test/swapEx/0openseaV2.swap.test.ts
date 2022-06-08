@@ -12,15 +12,13 @@ const buyer = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
         const sellEx = new OpenseaExAgent({
             chainId: 4,
             address: seller,
-            priKey: secrets.accounts[seller],
-            rpcUrl
+            privateKeys: secrets.privateKeys,
         })
 
         const eleSwapEx = new SwapEx({
             chainId: 4,
             address: buyer,
-            rpcUrl,
-            priKey: secrets.accounts[buyer]
+            privateKeys: secrets.privateKeys,
         });
 
 

@@ -624,11 +624,11 @@ export class OpenseaEx extends EventEmitter {
         await this.checkMatchOrder(orderStr)
         const {callData, sell} = await this.getMatchCallData({orderStr})
         console.assert(sell.exchange.toLowerCase() == this.exchange.address.toLowerCase(), 'AcceptOrder error')
-        const rpcUrl = this.walletInfo.rpcUrl = await getChainRpcUrl(this.walletInfo.chainId)
-        const gas = await getEstimateGas(rpcUrl, callData).catch(async (err: any) => {
-            console.log(err)
-            throw err
-        })
+        // const rpcUrl = this.walletInfo.rpcUrl?.url || await getChainRpcUrl(this.walletInfo.chainId)
+        // const gas = await getEstimateGas(rpcUrl, callData).catch(async (err: any) => {
+        //     console.log(err)
+        //     throw err
+        // })
         // return gas
         return ethSend(this.walletInfo, callData)
     }
@@ -653,7 +653,7 @@ export class OpenseaEx extends EventEmitter {
             to: data.to,
             data: data.data
         } as LimitedCallSpec
-        const rpcUrl = this.walletInfo.rpcUrl || await getChainRpcUrl(this.walletInfo.chainId)
+        const rpcUrl = this.walletInfo.rpcUrl?.url || await getChainRpcUrl(this.walletInfo.chainId)
         const gas = await getEstimateGas(rpcUrl, callData)
         // console.log(gas)
         return ethSend(this.walletInfo, callData)
@@ -667,7 +667,7 @@ export class OpenseaEx extends EventEmitter {
             to: this.exchange.options.address,
             data: data.data
         } as LimitedCallSpec
-        const rpcUrl = this.walletInfo.rpcUrl || await getChainRpcUrl(this.walletInfo.chainId)
+        const rpcUrl = this.walletInfo.rpcUrl?.url || await getChainRpcUrl(this.walletInfo.chainId)
         await getEstimateGas(rpcUrl, callData)
         return ethSend(this.walletInfo, callData)
     }
@@ -687,7 +687,7 @@ export class OpenseaEx extends EventEmitter {
     }
 
     async estimateGas(callData: LimitedCallSpec) {
-        const rpcUrl = this.walletInfo.rpcUrl || await getChainRpcUrl(this.walletInfo.chainId)
+        const rpcUrl = this.walletInfo.rpcUrl?.url || await getChainRpcUrl(this.walletInfo.chainId)
         return getEstimateGas(rpcUrl, callData).catch(err => {
             throw err
         })

@@ -12,7 +12,7 @@ import {
     WalletInfo, getEstimateGas, CHAIN_CONFIG, getChainRpcUrl
 } from 'web3-wallets'
 
-import {Web3Accounts} from "web3-accounts"
+import {transactionToCallData, Web3Accounts} from "web3-accounts"
 
 export interface SimpleTrades {
     value: string
@@ -192,8 +192,8 @@ export class SwapEx extends EventEmitter {
             tradeData: callData.data
         }
         const tx = await this.swapExContract.populateTransaction.buyOneWithETH(marketProxy, tradeDetail, {value})
-        const buyOneCallData = {...tx, value: tx.value?.toString()} as LimitedCallSpec
-        await getEstimateGas(this.walletInfo.rpcUrl || '', buyOneCallData)
+        const buyOneCallData = transactionToCallData(tx)
+        await getEstimateGas(this.walletInfo.rpcUrl?.url || '', buyOneCallData)
 
         const tradeData = <TradeDetails>{
             marketId,
