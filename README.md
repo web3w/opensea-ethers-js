@@ -172,8 +172,9 @@ const listing = await seaport.createSellOrder({
 ### Posting Orders
 
 ```ts
+// const orderStr = JSON.stringify(offer)
 const orderStr = JSON.stringify(listing)
-const order = await sellEx.api.postSingedOrder(orderStr).catch((err: any) => {
+const order = await seaport.api.postSingedOrder(orderStr).catch((err: any) => {
     throw err
 }) 
 ```
@@ -218,16 +219,16 @@ up-to-date and detailed explanantions.
  * Attrs used by orderbook to make queries easier
  * More to come soon!
  */
-maker ? : string, // Address of the order's creator
-    taker ? : string, // The null address if anyone is allowed to take the order
-    side ? : OrderType, // 0 for offers, 1 for auctions
-    owner ? : string, // Address of owner of the order's asset 
-    asset_contract_address ? : string, // Contract address for order's asset 
-    token_ids ? : Array < number | string >
+ maker ? : string, // Address of the order's creator
+ taker ? : string, // The null address if anyone is allowed to take the order
+ side ? : OrderType, // 0 for offers, 1 for auctions
+ owner ? : string, // Address of owner of the order's asset 
+ asset_contract_address ? : string, // Contract address for order's asset 
+ token_ids ? : Array < number | string >
 
-    // For pagination
-    limit ? : number,
-    offset ? : number
+ // For pagination
+ limit ? : number,
+ offset ? : number
 ```
 
 ### Buying Items
