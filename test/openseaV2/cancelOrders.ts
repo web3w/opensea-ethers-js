@@ -19,19 +19,19 @@ const token = erc20Tokens[chainId][0] as Token
 const eleAgent = new OpenseaExAgent({
     chainId,
     address: newGuy,
-    priKey: secrets.accounts[newGuy]
+    privateKeys: secrets.privateKeys
 });
 
 const eleSDK = new OpenseaEx({
     chainId,
     address: seller,
-    priKey: secrets.accounts[seller]
+    privateKeys: secrets.privateKeys
 });
 
 const buySDK = new OpenseaEx({
     chainId,
     address: buyer,
-    priKey: secrets.accounts[buyer]
+    privateKeys: secrets.privateKeys
 });
 
 export function tokenToMetadata(token: Token, quantity: string = "1", data?: string): ExchangeMetadata {

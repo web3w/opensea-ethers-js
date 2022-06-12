@@ -2,7 +2,6 @@ import {
     Asset,
     Token,
     OfferType,
-    TokenSchemaName,
     OrderType,
     ExchangeMetadata,
     APIConfig
@@ -24,21 +23,21 @@ export {
 export type {Signature, WalletInfo, LimitedCallSpec, EIP712TypedData, EIP712Domain} from 'web3-wallets'
 
 
-export {TokenSchemaName, OrderType}
+export { OrderType}
 export type {Asset, Token, APIConfig, ExchangeMetadata}
 
-export interface AssetOrdersQueryParams {
+export interface OrdersQueryParams {
     token_ids: string[]
     asset_contract_address: string
     payment_token_address?: string
     include_bundled?: boolean
     maker?: string
     taker?: string
-    owner?: string
-    offset?: number
-    limit?: number
     side?: number
+    owner?: string
     order_by?: string
+    limit?: number
+    offset?: number
 }
 
 export interface AssetsQueryParams {

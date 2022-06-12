@@ -4,7 +4,6 @@ import {
     BuyOrderParams,
     CreateOrderParams,
     APIConfig,
-    TokenSchemaName,
     ExchangetAgent,
     ExchangeMetadata,
     LowerPriceOrderParams,
@@ -14,25 +13,26 @@ import {
     SellOrderParams
 } from "web3-accounts"
 
-import {WalletInfo, LimitedCallSpec, BigNumber,NULL_ADDRESS} from "./types"
+import {WalletInfo, LimitedCallSpec, BigNumber, NULL_ADDRESS} from "./types"
 
 import {OpenseaEx} from "./openseaEx";
 import {OpenseaAPI} from "../api/opensea";
+import {Asset} from "web3-accounts/lib/src/types";
 
 export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
     public contracts: OpenseaEx
     public walletInfo: WalletInfo
-    public openseaApi: OpenseaAPI
+    public api: OpenseaAPI
 
     constructor(wallet: WalletInfo, config?: APIConfig) {
         super()
-        const {chainId} = wallet
-        let conf: APIConfig = {chainId}
+        const {chainId, address} = wallet
+        let conf: APIConfig = {chainId, account: address}
         if (config) {
-            conf = config
+            conf = {...conf, ...config}
         }
         this.contracts = new OpenseaEx(wallet, conf)
-        this.openseaApi = new OpenseaAPI(wallet, conf)
+        this.api = new OpenseaAPI(conf)
         this.walletInfo = wallet
     }
 
@@ -56,18 +56,15 @@ export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
             const {address, quantity} = asset
             if (!quantity) throw 'Asset quantity is undefined'
 
-            if (schema == TokenSchemaName.ERC20) {
+            if (schema.toLowerCase() == 'erc20') {
                 const {allowance, balances, calldata} = await this.contracts.getTokenProxyApprove(address)
                 const spend = new BigNumber(quantity).times(new BigNumber(10).pow(decimals || 18))
-                // if (spend.gt(balances)) {
-                //     // throw 'Token is not enough'
-                // }
                 assetApprove.push({
                     isApprove: spend.lte(allowance),
                     balances,
                     calldata: spend.lte(allowance) ? undefined : calldata
                 })
-            } else if (schema == TokenSchemaName.ERC721 || schema == TokenSchemaName.ERC1155) {
+            } else if (schema.toLowerCase() == 'erc721' || schema.toLowerCase() == 'erc1155') {
                 const data = await this.contracts.getAssetProxyApprove(metaAsset)
                 assetApprove.push(data)
             }
@@ -83,20 +80,40 @@ export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
         return this.contracts.getMatchCallData(params)
     }
 
-    public async createSellOrder(params: SellOrderParams): Promise<any> {
+    async createSellOrder(params: SellOrderParams): Promise<any> {
         return this.contracts.createSellOrder(params)
     }
 
-    public async createBuyOrder(params: BuyOrderParams): Promise<any> {
+    async createBuyOrder(params: BuyOrderParams): Promise<any> {
         return this.contracts.createBuyOrder(params)
     }
 
-    public async acceptOrder(orderStr: string) {
-        return this.contracts.acceptOrder(orderStr)
+    async matchOrder(orderStr: string) {
+        return this.contracts.matchOrder(orderStr)
     }
 
-    public async cancelOrders(orders: string[]) {
+    async cancelOrders(orders: string[]) {
         return this.contracts.cancelOrders(orders)
+    }
+
+    async getAssetBalances(asset: Asset, account?: string): Promise<string> {
+        return this.contracts.userAccount.getAssetBalances(asset, account)
+    }
+
+    async getTokenBalances(params: {
+        tokenAddress: string;
+        accountAddress?: string;
+        rpcUrl?: string;
+    }): Promise<any> {
+        return this.contracts.userAccount.getTokenBalances({
+            tokenAddr: params.tokenAddress,
+            account: params.accountAddress,
+            rpcUrl: params.rpcUrl
+        })
+    }
+
+    async transfer(asset: Asset,  to: string,quantity: string): Promise<string> {
+        return this.contracts.userAccount.transfer(asset, quantity,to)
     }
 
     async createLowerPriceOrder(params: LowerPriceOrderParams): Promise<any> {

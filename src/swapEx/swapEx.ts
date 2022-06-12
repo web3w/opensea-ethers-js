@@ -8,8 +8,8 @@ import {
 
 
 import {
-    ethSend, TokenSchemaName, LimitedCallSpec,
-    WalletInfo, getEstimateGas, CHAIN_CONFIG, getChainRpcUrl
+    ethSend, LimitedCallSpec,
+    WalletInfo, getEstimateGas, CHAIN_CONFIG, getChainRpcUrl, TokenSchemaNames
 } from 'web3-wallets'
 
 import {transactionToCallData, Web3Accounts} from "web3-accounts"
@@ -39,7 +39,7 @@ export interface ExSwapTradeData {
     tokenId: string
     value: string
     orderHash: string
-    schema: TokenSchemaName
+    schema: TokenSchemaNames
 }
 
 

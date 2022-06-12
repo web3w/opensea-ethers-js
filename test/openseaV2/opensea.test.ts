@@ -1,8 +1,8 @@
 import * as secrets from '../../../secrets.json'
 import {assetToMetadata} from "../../src/openseaEx/utils/helper";
+import {OpenseaEx} from "../../src/openseaEx/openseaEx";
 import {Web3Accounts, Asset, SellOrderParams} from "web3-accounts";
-import {asset721,erc20Tokens} from "../assets";
-import {OpenseaExAgent} from "../../src/openseaEx/openseaExAgent";
+import {asset721} from "../assets";
 
 
 const buyer = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
@@ -13,23 +13,21 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 ;(async () => {
         try {
             const chainId = 4
-            const sellEx = new OpenseaExAgent({
+            const sellEx = new OpenseaEx({
                 chainId,
                 address: seller,
                 privateKeys: secrets.privateKeys
             },)
 
-            const buyerSdk = new OpenseaExAgent({
+            const buyerSdk = new OpenseaEx({
                 chainId,
                 address: buyer,
                 privateKeys: secrets.privateKeys
             })
             const sellAsset = asset721[chainId][1] as Asset
-            const erc20 =erc20Tokens[chainId][0] as Asset
 
-            const erc20Bal = await sellEx.getTokenBalances(sellAsset)
-            const sellBal = await sellEx.getAssetBalances(sellAsset)
-            const buyerBal = await sellEx.getAssetBalances(sellAsset, buyer)
+            const sellBal = await sellEx.userAccount.getAssetBalances(sellAsset)
+            const buyerBal = await sellEx.userAccount.getAssetBalances(sellAsset, buyer)
             if (sellBal == '0' && buyerBal == '0') {
                 throw 'Asset balance 0'
             }
@@ -65,7 +63,7 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
                 orderStr,
             })
             //https://rinkeby.etherscan.io/tx/0x290a6ae032856189e148b0d352ab76b45c2f07bbf2db4f32ed65c21e2798c5a6
-            const gas = await buyerSdk.contracts.estimateGas(callData).catch(async (err: any) => {
+            const gas = await buyerSdk.estimateGas(callData).catch(async (err: any) => {
                 console.log(err)
             })
             console.log('Buy Now success ', gas)
@@ -84,7 +82,7 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
             })
 
             //ok https://rinkeby.etherscan.io/tx/0x1a9ab7ba090f62460a2157187578ba7698cadd9d48a430cadc2da785e890c0b8
-            const offerGas = await sellEx.contracts.estimateGas(offerOrder.callData).catch(async (err: any) => {
+            const offerGas = await sellEx.estimateGas(offerOrder.callData).catch(async (err: any) => {
                 console.log(err)
             })
             console.log("Offer  success ", offerGas)

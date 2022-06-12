@@ -2,7 +2,6 @@ import {Button, Modal, Radio, Space, Table} from "antd";
 import React, {useContext, useEffect, useState} from "react";
 import {Context} from '../AppContext'
 import "./index.css"
-import {OrderType,} from "web3-wallets";
 
 import {nftOrder} from './config'
 
@@ -67,7 +66,7 @@ export function OpenseaOrderList(props) {
             token_ids: selectOrder.name
         }]
         const foo = {assets}
-        const asset = await eleSDK.openseaApi.getAssets(foo)
+        const asset = await eleSDK.api.getAssets(foo)
         const sellAsset = {
             tokenId: selectOrder.name,
             tokenAddress: selectOrder.assetAddress,

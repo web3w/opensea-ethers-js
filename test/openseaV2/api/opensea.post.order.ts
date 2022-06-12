@@ -1,7 +1,7 @@
 import {SellOrderParams} from "web3-accounts";
 
 import * as secrets from '../../../../secrets.json'
-import {OrdersQueryParams} from "../../../src/openseaEx/types";
+import {AssetOrdersQueryParams} from "../../../src/openseaEx/types";
 import {OpenseaExAgent} from "../../../src/openseaEx/openseaExAgent";
 import {asset721} from "../../assets";
 import {AssetsQueryParams} from "element-sdk";
@@ -46,7 +46,7 @@ const Test_API_CONFIG = {
             const query = {
                 asset_contract_address: sellAsset.tokenAddress, //
                 token_ids: [sellAsset.tokenId]
-            } as OrdersQueryParams
+            } as AssetOrdersQueryParams
             const {orders} = await sellEx.api.getOrders(query)
             console.log(orders)
 

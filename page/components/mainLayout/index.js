@@ -7,7 +7,6 @@ import {WatchNFTOrderList} from "./WatchNFTOrderList";
 import {UserOrderList} from "./UserOrderList";
 import {UserNFTList} from "./UserNFTList";
 import {OpenseaOrderList} from "./OpenseaOrderList";
-// import {CreateOrderForm} from "./CreateOrderForm";
 
 const {Header, Content, Footer, Sider} = Layout;
 
@@ -61,7 +60,7 @@ export function MainLayout() {
         <Layout style={{minHeight: '100vh'}}>
             <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
                 <div className="logo">Element SDK</div>
-                <Menu theme="dark" defaultSelectedKeys={['WatchNFTOrders']} mode="inline"
+                <Menu theme="dark" defaultSelectedKeys={['OpenseaOrders']} mode="inline"
                       onClick={selectWallet}>
                     {
                         SupportWallet.map(val => (

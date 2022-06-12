@@ -10,7 +10,7 @@ import {
     Token,
     APIConfig,
     OrderType,
-    Asset, TokenSchemaName,
+    Asset,
     BuyOrderParams,
     CreateOrderParams,
     MatchParams,
@@ -61,7 +61,6 @@ export class OpenseaEx extends EventEmitter {
     public assetShared: Contract
 
     public userAccount: Web3Accounts
-
     public GasWarpperToken: Token
 
     constructor(wallet: WalletInfo, config?: APIConfig) {
@@ -120,6 +119,7 @@ export class OpenseaEx extends EventEmitter {
         } as LimitedCallSpec
     }
 
+    //1 register proxy
     async getAccountProxy(account?: string): Promise<{ accountProxy: string }> {
         if (account) {
             const accountProxy = await this.exchangeProxyRegistry.proxies(account)
@@ -254,12 +254,8 @@ export class OpenseaEx extends EventEmitter {
             buy.staticExtradata,
             sell.staticExtradata
         ]
-        //             0xfb16a5950000000000000000000000009f7a946d935c8efc7a8329c0d894a69ba241345a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000005fecbbbaf9f3126043a48a35eb2eb8667d469d53000000000000000000000000000000000000000000000000000000000008c1a4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000
-        //calldataSell 0xfb16a5950000000000000000000000009f7a946d935c8efc7a8329c0d894a69ba241345a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b556f251eacbec4badbcddc4a146906f2c095bee0000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000
 
-        //replacementPatternSell 0x000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
         await this.isCanMatch({params, buy, sell})
-        // const data = await this.contracts.exchange.methods.atomicMatch_(...params, [buy.v, sell.v], [buy.r, buy.s, sell.r, sell.s, metadata]).encodeABI()
 
         const data = await this.exchange.populateTransaction.atomicMatch_(...params,
             [buy.v || 0, sell.v || 0],
@@ -344,7 +340,6 @@ export class OpenseaEx extends EventEmitter {
         return this.creatSignedOrder({unHashOrder: sellOrder})
     }
 
-    // 创建报价订单
     public async createBuyOrder({
                                     asset,
                                     quantity = 1,
@@ -360,7 +355,7 @@ export class OpenseaEx extends EventEmitter {
         const accountAddress = this.walletInfo.address
 
         const params = {asset, quantity, paymentToken, startAmount, expirationTime} as CreateOrderParams
-        const {tokenApprove} = await this.getOrderApproveStep(params, OrderType.Sell)
+        const {tokenApprove} = await this.getOrderApproveStep(params, OrderType.Buy)
 
         if (!tokenApprove.isApprove) {
             const tx = await ethSend(this.walletInfo, tokenApprove.calldata)
@@ -515,7 +510,7 @@ export class OpenseaEx extends EventEmitter {
         return isValidOrder
     }
 
-    public async encodeCallData(order: UnhashedOrder, assetRecipientAddress: string) {
+    private async encodeCallData(order: UnhashedOrder, assetRecipientAddress: string) {
         const from = order.maker
         // const to = NULL_ADDRESS
         const token = order.metadata.asset.address
@@ -526,7 +521,7 @@ export class OpenseaEx extends EventEmitter {
         let dataToCall = "", replacementPattern = ""
 
         //ok https://rinkeby.etherscan.io/tx/0x1a9ab7ba090f62460a2157187578ba7698cadd9d48a430cadc2da785e890c0b8
-        if (order.metadata.schema == TokenSchemaName.ERC721) {
+        if (order.metadata.schema.toLowerCase() == 'erc721') {
             // const gas = await this.contracts.merkleValidator.estimateGas.matchERC721UsingCriteria(from, to, token, tokenId, root, proof)
 
             if (order.side == OrderType.Sell) {
@@ -537,27 +532,21 @@ export class OpenseaEx extends EventEmitter {
 
             if (order.side == OrderType.Buy) {
                 const callData = await this.merkleValidator.populateTransaction.matchERC721UsingCriteria(NULL_ADDRESS, assetRecipientAddress, token, tokenId, root, proof)
-                //0xfb16a595000000000000000000000000000000000000000000000000000000000000000000000000000000000000000036b1a29e0bbd47dfe9dcf7380f276e86da90c4c2000000000000000000000000b556f251eacbec4badbcddc4a146906f2c095bee0000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000
-                //0xfb16a59500000000000000000000000000000000000000000000000000000000000000000000000000000000000000009f7a946d935c8efc7a8329c0d894a69ba241345a0000000000000000000000005fecbbbaf9f3126043a48a35eb2eb8667d469d53000000000000000000000000000000000000000000000000000000000008c1a4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000000
                 dataToCall = callData.data || ""
                 replacementPattern = '0x00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
             }
         }
 
-        if (order.metadata.schema == TokenSchemaName.ERC1155) {
+        if (order.metadata.schema.toLowerCase() == 'erc1155') {
 
             if (order.side == OrderType.Sell) {
                 const callData = await this.merkleValidator.populateTransaction.matchERC1155UsingCriteria(from, NULL_ADDRESS, token, tokenId, amount, root, proof)
-
-                //0x96809f900000000000000000000000009f7a946d935c8efc7a8329c0d894a69ba241345a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000b6316833725f866f2aad846de30a5f50f09e247b00000000000000000000000000000000000000000000000000000180652df5a80000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000
                 dataToCall = callData.data || ""
                 replacementPattern = '0x000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
             }
             if (order.side == OrderType.Buy) {
                 //
                 const callData = await this.merkleValidator.populateTransaction.matchERC1155UsingCriteria(NULL_ADDRESS, assetRecipientAddress, token, tokenId, amount, root, proof)
-                //0x96809f9000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a56b3317ed60dc4e1027a63ffbe9df6fb102401000000000000000000000000b6316833725f866f2aad846de30a5f50f09e247b00000000000000000000000000000000000000000000000000000180652df5a80000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000
-                //0x96809f9000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a56b3317ed60dc4e1027a63ffbe9df6fb102401000000000000000000000000b6316833725f866f2aad846de30a5f50f09e247b00000000000000000000000000000000000000000000000000000180652df5a80000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000000
                 dataToCall = callData.data || ""
                 replacementPattern = '0x00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
             }
@@ -566,8 +555,7 @@ export class OpenseaEx extends EventEmitter {
         return {dataToCall, replacementPattern, target}
     }
 
-
-    public async makeMatchingOrder(params: { order: any, makerAddress: string, assetRecipientAddress: string }) {
+    private async makeMatchingOrder(params: { order: any, makerAddress: string, assetRecipientAddress: string }) {
         const {order, makerAddress, assetRecipientAddress} = params
         const bestOrder: OrderJSON = order as OrderJSON
         const signedOrder = orderFromJSON(bestOrder)
@@ -588,7 +576,7 @@ export class OpenseaEx extends EventEmitter {
 
     }
 
-    public async isCanMatch({params, buy, sell}: { params: any, buy: OrderJSON, sell: OrderJSON }) {
+    private async isCanMatch({params, buy, sell}: { params: any, buy: OrderJSON, sell: OrderJSON }) {
         const exchange = this.exchange
         // exchange.options.address = sell.exchange
 
@@ -620,16 +608,10 @@ export class OpenseaEx extends EventEmitter {
         }
     }
 
-    public async acceptOrder(orderStr: string) {
+    public async matchOrder(orderStr: string) {
         await this.checkMatchOrder(orderStr)
         const {callData, sell} = await this.getMatchCallData({orderStr})
         console.assert(sell.exchange.toLowerCase() == this.exchange.address.toLowerCase(), 'AcceptOrder error')
-        // const rpcUrl = this.walletInfo.rpcUrl?.url || await getChainRpcUrl(this.walletInfo.chainId)
-        // const gas = await getEstimateGas(rpcUrl, callData).catch(async (err: any) => {
-        //     console.log(err)
-        //     throw err
-        // })
-        // return gas
         return ethSend(this.walletInfo, callData)
     }
 

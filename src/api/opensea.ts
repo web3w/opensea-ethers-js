@@ -4,27 +4,27 @@ import {openseaOrderFromJSON} from "../openseaEx/utils/helper";
 import QueryString from "querystring";
 import {
     AssetCollection,
-    AssetOrdersQueryParams,
+    OrdersQueryParams,
     AssetsQueryParams,
     APIConfig,
-    WalletInfo
+    WalletInfo, OrderType
 } from "../openseaEx/types";
+
 import {OPENSEA_API_TIMEOUT, OPENSEA_API_CONFIG, ORDERS_PATH} from "../openseaEx/utils/constants";
 
 export class OpenseaAPI extends Fetch {
     constructor(
-        wallet: WalletInfo,
         config?: APIConfig
     ) {
         super()
-        const {chainId} = wallet
+        const chainId = config?.chainId || 1
         if (OPENSEA_API_CONFIG[chainId]) {
             this.apiBaseUrl = config?.apiBaseUrl || OPENSEA_API_CONFIG[chainId].apiBaseUrl
             this.apiKey = config?.authToken || OPENSEA_API_CONFIG[chainId].apiKey
             this.proxyUrl = config?.proxyUrl || ""
             this.apiTimeout = config?.apiTimeout || OPENSEA_API_TIMEOUT
         } else {
-            throw 'OpenseaAPI unsport chainId:' + wallet.chainId
+            throw 'OpenseaAPI unsport chainId:' + config?.chainId
         }
     }
 
@@ -60,14 +60,14 @@ export class OpenseaAPI extends Fetch {
         }
     }
 
-    public async getAssetOrders(queryParams: AssetOrdersQueryParams, retries = 2): Promise<any> {
+    public async getOrders(queryParams: OrdersQueryParams, retries = 2): Promise<any> {
         const {token_ids, asset_contract_address} = queryParams
         try {
             const query = {
                 token_ids,
                 asset_contract_address,
                 limit: queryParams.limit || 10,
-                side: queryParams.side || 0,
+                side: queryParams.side || OrderType.Buy,
                 order_by: queryParams.order_by || 'created_date'
             }
             const json = await this.get(`${ORDERS_PATH}/orders`, query, {
@@ -84,11 +84,14 @@ export class OpenseaAPI extends Fetch {
                 const order = openseaOrderFromJSON(orders[i])
                 eleOrders.push(orderToJSON(order))
             }
-            return eleOrders
+            return {
+                orders: eleOrders,
+                count: json.count
+            }
         } catch (error: any) {
             this.throwOrContinue(error, retries)
             await Sleep(3000)
-            return this.getAssetOrders(queryParams, retries - 1)
+            return this.getOrders(queryParams, retries - 1)
         }
     }
 

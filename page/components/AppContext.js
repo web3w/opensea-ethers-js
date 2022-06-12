@@ -1,8 +1,8 @@
 import React, {createContext, useEffect} from "react";
-import {ProviderNames, Web3Wallets} from 'web3-wallets';
+import {Web3Wallets} from 'web3-wallets';
 import {OpenseaExAgent} from "../../src/openseaEx/openseaExAgent";
 
-const wallet = new Web3Wallets(ProviderNames.Metamask)
+const wallet = new Web3Wallets('metamask')
 const eleSDK = new OpenseaExAgent({
     chainId: wallet.walletProvider.chainId,
     address: wallet.walletProvider.address,
@@ -10,7 +10,6 @@ const eleSDK = new OpenseaExAgent({
 
 export const Context = createContext({wallet, eleSDK});
 export const AppContext = ({children}) => {
-
     useEffect(() => {
         // setLoading(true);
         console.log("AppContext: wallet change")
