@@ -9,7 +9,7 @@ Ethers implementation of OpenSea-JS
 In your project, run:
 
 ```bash
-npm install --save opensea-js
+npm i opensea-ethers-js
 ```
 
 ## Getting Started
