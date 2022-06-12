@@ -1,7 +1,7 @@
 export {OpenseaAPI} from './src/api/opensea'
 export type {
     AssetsQueryParams,
-    AssetOrdersQueryParams,
+    OrdersQueryParams,
     AssetCollection
 } from './src/openseaEx/types'
 export {OrderType} from './src/openseaEx/types'

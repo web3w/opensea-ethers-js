@@ -25,7 +25,7 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
                 privateKeys: secrets.privateKeys
             })
             const sellAsset = asset721[chainId][1] as Asset
-            const erc20 =erc20Tokens[chainId][0] as Asset
+            // const erc20 =erc20Tokens[chainId][0] as Asset
 
             const erc20Bal = await sellEx.getTokenBalances(sellAsset)
             const sellBal = await sellEx.getAssetBalances(sellAsset)

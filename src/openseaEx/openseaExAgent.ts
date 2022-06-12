@@ -112,8 +112,8 @@ export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
         })
     }
 
-    async transfer(asset: Asset,  to: string,quantity: string): Promise<string> {
-        return this.contracts.userAccount.transfer(asset, quantity,to)
+    async transfer(asset: Asset, to: string, quantity: number) {
+        return this.contracts.userAccount.transfer(asset, to, quantity)
     }
 
     async createLowerPriceOrder(params: LowerPriceOrderParams): Promise<any> {
