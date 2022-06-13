@@ -9,6 +9,7 @@ import {
     NULL_ADDRESS,
     ExchangeMetadata
 } from '../types'
+import {assert, schemas} from "../../assert/index";
 
 export function toBaseUnitAmount(amount: BigNumber, decimals: number): BigNumber {
     const unit = new BigNumber(10).pow(decimals)
@@ -112,6 +113,7 @@ export function getEIP712TypedData(orderStr: string, eip712Domain: any, nonce: n
 
 export function getWyvOrderParams(orderStr: string): { orderJson: any, orderParm: Array<any> } {
     const order: OrderJSON = JSON.parse(orderStr)
+
     const orderParm = [
         [order.exchange, order.maker, order.taker, order.feeRecipient, order.target, order.staticTarget, order.paymentToken],
         [
@@ -129,7 +131,7 @@ export function getWyvOrderParams(orderStr: string): { orderJson: any, orderParm
         order.side,
         order.saleKind,
         order.howToCall,
-        order.calldata,// order.calldata,
+        order.calldata,
         order.replacementPattern,
         order.staticExtradata
     ]
@@ -159,6 +161,7 @@ export function metadataToAsset(metadata: ExchangeMetadata, data?: Asset): Asset
 
 export const openseaOrderFromJSON = (order: any): Order => {
     // console.log(order)
+    if (!order) throw new Error("OpenseaOrderFromJSON error")
     const createdDate = new Date(`${order.created_date}Z`)
 
     const fromJSON: Order = {

@@ -154,12 +154,6 @@ export enum FeeMethod {
     SplitFee = 1
 }
 
-//
-// export enum OrderType {
-//     All = -1,
-//     Buy = 0,
-//     Sell = 1
-// }
 
 export enum SaleKind {
     FixedPrice = 0,

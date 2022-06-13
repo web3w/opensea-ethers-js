@@ -28,7 +28,7 @@ const order = {
         "saleKind": 0,
         "target": "0x56df6c8484500dc3e2fe5a02bed70b4969ffafdb",
         "howToCall": 0,
-        "dataToCall": "0x23b872dd000000000000000000000000633f6c7e25ee757d12643a32ce1586ac9e8542d500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000025",
+        "calldata": "0x23b872dd000000000000000000000000633f6c7e25ee757d12643a32ce1586ac9e8542d500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000025",
         "replacementPattern": "0x000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000000000000000000000000000000000000000000000000000",
         "staticTarget": "0x0000000000000000000000000000000000000000",
         "staticExtradata": "0x",
@@ -54,10 +54,7 @@ const order = {
 ;(async () => {
     try {
         assert.doesConformToSchema('Metadata check', order.metadata, schemas.metadataSchema)
-
-        return
-
-        // assert.doesConformToSchema('OrderStringCheck', order, schemas.tokenSchema)
+        assert.doesConformToSchema('OrderStringCheck', order, schemas.orderSchema)
         // console.log("")
     } catch (e: any) {
         console.log(e.message)

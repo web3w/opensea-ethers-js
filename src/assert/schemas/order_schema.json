@@ -43,7 +43,7 @@
     "howToCall": {
       "$ref": "/wholeNumberSchema"
     },
-    "dataToCall": {
+    "calldata": {
       "$ref": "/hexSchema"
     },
     "replacementPattern": {
@@ -97,18 +97,30 @@
     "taker",
     "maker",
     "makerRelayerFee",
-    "senderAddress",
-    "makerAssetAmount",
-    "takerAssetAmount",
-    "makerAssetData",
-    "takerAssetData",
-    "makerFeeAssetData",
-    "takerFeeAssetData",
+    "takerRelayerFee",
+    "makerProtocolFee",
+    "takerProtocolFee",
+    "makerReferrerFee",
+    "feeMethod",
+    "feeRecipient",
+    "saleKind",
+    "target",
+    "howToCall",
+    "calldata",
+    "replacementPattern",
+    "staticTarget",
+    "staticExtradata",
+    "paymentToken",
+    "quantity",
+    "basePrice",
+    "extra",
+    "listingTime",
     "salt",
-    "feeRecipientAddress",
-    "expirationTimeSeconds",
-    "chainId",
-    "exchangeAddress"
+    "metadata",
+    "v",
+    "r",
+    "s",
+    "hash"
   ],
   "type": "object"
 }

@@ -1,4 +1,4 @@
-import {Fetch, Sleep} from "./restful/base";
+import {BaseFetch, sleep} from "web3-accounts";
 import {orderToJSON} from "../openseaEx/utils/makeOrder";
 import {openseaOrderFromJSON} from "../openseaEx/utils/helper";
 import QueryString from "querystring";
@@ -7,21 +7,24 @@ import {
     OrdersQueryParams,
     AssetsQueryParams,
     APIConfig,
-    WalletInfo, OrderType
+    OrderType, OrderJSON
 } from "../openseaEx/types";
 
-import {OPENSEA_API_TIMEOUT, OPENSEA_API_CONFIG, ORDERS_PATH} from "../openseaEx/utils/constants";
+import {OPENSEA_API_TIMEOUT, OPENSEA_API_CONFIG, ORDERS_PATH, OPENSEA_API_KEY} from "../openseaEx/utils/constants";
+import {assert, schemas} from "../assert/index";
 
-export class OpenseaAPI extends Fetch {
+export class OpenseaAPI extends BaseFetch {
     constructor(
         config?: APIConfig
     ) {
-        super()
         const chainId = config?.chainId || 1
+        const apiBaseUrl = config?.apiBaseUrl || OPENSEA_API_CONFIG[chainId].apiBaseUrl
+        super({
+            apiBaseUrl,
+            apiKey: config?.apiKey || OPENSEA_API_KEY
+        })
         if (OPENSEA_API_CONFIG[chainId]) {
-            this.apiBaseUrl = config?.apiBaseUrl || OPENSEA_API_CONFIG[chainId].apiBaseUrl
-            this.apiKey = config?.authToken || OPENSEA_API_CONFIG[chainId].apiKey
-            this.proxyUrl = config?.proxyUrl || ""
+            this.proxyUrl = config?.proxyUrl
             this.apiTimeout = config?.apiTimeout || OPENSEA_API_TIMEOUT
         } else {
             throw 'OpenseaAPI unsport chainId:' + config?.chainId
@@ -46,7 +49,7 @@ export class OpenseaAPI extends Fetch {
             : QueryString.stringify(query)
 
         try {
-            const json = await this.getURL('/api/v1/assets', queryUrl)
+            const json = await this.getQueryString('/api/v1/assets', queryUrl)
             return json.assets.map(val => ({
                 ...val.asset_contract,
                 buy_orders: val.buy_orders,
@@ -55,12 +58,12 @@ export class OpenseaAPI extends Fetch {
             }))
         } catch (error: any) {
             this.throwOrContinue(error, retries)
-            await Sleep(3000)
+            await sleep(3000)
             return this.getAssets(queryParams, retries - 1)
         }
     }
 
-    public async getOrders(queryParams: OrdersQueryParams, retries = 2): Promise<any> {
+    public async getOrders(queryParams: OrdersQueryParams, retries = 2): Promise<{ orders: OrderJSON[], count: number }> {
         const {token_ids, asset_contract_address} = queryParams
         try {
             const query = {
@@ -72,40 +75,35 @@ export class OpenseaAPI extends Fetch {
             }
             const json = await this.get(`${ORDERS_PATH}/orders`, query, {
                 headers: {
-                    "X-API-KEY": this.apiKey
+                    "X-API-KEY": this.apiKey || OPENSEA_API_KEY
                 }
             })
-            const orders = json.orders
-            if (!orders) {
+            if (!json.orders) {
                 throw new Error('Not  found: no  matching  order  found')
             }
-            const eleOrders: any[] = []
-            for (let i = 0; i < orders.length; i++) {
-                const order = openseaOrderFromJSON(orders[i])
-                eleOrders.push(orderToJSON(order))
+            const orders: any[] = []
+            for (let i = 0; i < json.orders.length; i++) {
+                const order = openseaOrderFromJSON(json.orders[i])
+                orders.push(orderToJSON(order))
             }
             return {
-                orders: eleOrders,
+                orders,
                 count: json.count
             }
         } catch (error: any) {
             this.throwOrContinue(error, retries)
-            await Sleep(3000)
+            await sleep(3000)
             return this.getOrders(queryParams, retries - 1)
         }
     }
 
-    public async postSingedOrder(orderStr: string, retries = 2): Promise<any> {
+    public async postOrder(orderStr: string, retries = 2): Promise<any> {
         const singSellOrder = JSON.parse(orderStr)
-        // delete singSellOrder.hash
-        // delete singSellOrder.offerType
-        // singSellOrder.calldata = singSellOrder.dataToCall
-        // singSellOrder.nonce = singSellOrder.nonce.toString()
-        // delete singSellOrder.dataToCall
+        assert.doesConformToSchema('PostOrder', singSellOrder, schemas.orderSchema)
         try {
             const opts = {
                 headers: {
-                    'X-API-KEY': this.apiKey
+                    'X-API-KEY': this.apiKey || "))))"
                 }
             }
             const result = await this.post(
@@ -119,10 +117,9 @@ export class OpenseaAPI extends Fetch {
             return result
         } catch (error: any) {
             this.throwOrContinue(error, retries)
-            await Sleep(3000)
-            return this.postSingedOrder(orderStr, retries)
+            await sleep(3000)
+            return this.postOrder(orderStr, retries)
         }
     }
-
 
 }

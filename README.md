@@ -169,12 +169,12 @@ const listing = await seaport.createSellOrder({
 })
 ```
 
-### Posting Orders
+### Posting Order
 
 ```ts
 // const orderStr = JSON.stringify(offer)
 const orderStr = JSON.stringify(listing)
-const order = await seaport.api.postSingedOrder(orderStr).catch((err: any) => {
+const order = await seaport.api.postOrder(orderStr).catch((err: any) => {
     throw err
 }) 
 ```
@@ -237,7 +237,7 @@ To buy an item , you need to **fulfill a sell order**. To do that, it's just one
 
 ```JavaScript
 const orders = await seaport.api.getOrders({side: OrderType.Sell, ...})
-const tx = await seaport.matchOrder(JSON.stringify(orders[0]))
+const tx = await seaport.fulfillOrder(JSON.stringify(orders[0]))
 console.log(tx.hash)
 await tx.wait()
 ```
@@ -256,7 +256,7 @@ offer.
 
 ```JavaScript
 const orders = await seaport.api.getOrders({side: OrderType.Buy, ...})
-const tx = await seaport.matchOrder(JSON.stringify(orders[0]))
+const tx = await seaport.fulfillOrder(JSON.stringify(orders[0]))
 console.log(tx.hash)
 await tx.wait()
 ```

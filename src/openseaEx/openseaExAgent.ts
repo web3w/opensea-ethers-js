@@ -92,6 +92,10 @@ export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
         return this.contracts.matchOrder(orderStr)
     }
 
+    async fulfillOrder(orderStr: string) {
+        return this.contracts.matchOrder(orderStr)
+    }
+
     async cancelOrders(orders: string[]) {
         return this.contracts.cancelOrders(orders)
     }

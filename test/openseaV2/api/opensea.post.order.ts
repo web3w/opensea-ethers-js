@@ -1,7 +1,6 @@
 import {SellOrderParams} from "web3-accounts";
 
 import * as secrets from '../../../../secrets.json'
-import {AssetOrdersQueryParams} from "../../../src/openseaEx/types";
 import {OpenseaExAgent} from "../../../src/openseaEx/openseaExAgent";
 import {asset721} from "../../assets";
 import {AssetsQueryParams} from "element-sdk";
@@ -41,16 +40,10 @@ const Test_API_CONFIG = {
                 privateKeys: secrets.privateKeys
             }, config)
 
+
+
+
             const sellAsset = asset721[chainId][1]
-
-            const query = {
-                asset_contract_address: sellAsset.tokenAddress, //
-                token_ids: [sellAsset.tokenId]
-            } as AssetOrdersQueryParams
-            const {orders} = await sellEx.api.getOrders(query)
-            console.log(orders)
-
-            const tx = await buyEx.matchOrder(JSON.stringify(orders[0]))
 
             // paymentToken: sellEx.contracts.ETH,
             const sellParams = {
@@ -61,10 +54,20 @@ const Test_API_CONFIG = {
             // const sellData = await sellEx.createSellOrder(sellParams)
             const sellData = await sellEx.createBuyOrder(sellParams)
 
-            const foo = await sellEx.api.postSingedOrder(JSON.stringify(sellData)).catch((e: any) => {
+            const foo = await sellEx.api.postOrder(JSON.stringify(sellData)).catch((e: any) => {
                 console.log('eee', e.message)
             })
             console.log('success', foo)
+            return
+
+            const query = {
+                asset_contract_address: sellAsset.tokenAddress, //
+                token_ids: [sellAsset.tokenId]
+            }
+            const {orders} = await sellEx.api.getOrders(query)
+            console.log(orders)
+
+            const tx = await buyEx.matchOrder(JSON.stringify(orders[0]))
 
 
 

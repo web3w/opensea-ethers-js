@@ -41,6 +41,7 @@ import {
 import {ElementError} from "./utils/error";
 import {metadataToAsset, getWyvOrderParams, getEIP712TypedData} from "./utils/helper";
 import {DEFAULT_EXPIRATION_TIME, DEFAULT_LISTING_TIME, DEFAULT_SELLER_FEE_BASIS_POINTS} from "./utils/constants";
+import {assert, schemas} from "../assert/index";
 
 
 export class OpenseaEx extends EventEmitter {
@@ -228,6 +229,7 @@ export class OpenseaEx extends EventEmitter {
     ): Promise<{ callData: LimitedCallSpec, params: any, buy: OrderJSON, sell: OrderJSON }> {
 
         const bestOrder: OrderJSON = JSON.parse(orderStr)
+        assert.doesConformToSchema('OrderStringCheck', bestOrder, schemas.orderSchema)
         const makeParmas = {
             order: bestOrder,
             makerAddress: makerAddress || this.walletInfo.address,
