@@ -7,25 +7,36 @@ import {
     UnhashedOrder,
     UnsignedOrder,
     Token,
-    BigNumber,
+    BigNumber, FeeMethod,
 } from '../types'
 
 import {ElementError} from './error'
-import {_getBuyFeeParameters, _getSellFeeParameters, computeFees} from './fees'
 import {
     MIN_EXPIRATION_SECONDS,
     ORDER_MATCHING_LATENCY_SECONDS,
     STATIC_EXTRADATA,
-    NULL_ADDRESS
+    NULL_ADDRESS, INVERSE_BASIS_POINT
 } from './constants'
 import {makeBigNumber, toBaseUnitAmount} from './helper'
 import {OfferType, OrderType, MetaAsset} from "web3-accounts";
 
 
-// export enum OfferType {
-//     ItemOffer = 'item_offer',
-//     ContractOffer = 'contract_offer'
-// }
+/**
+ * Validate fee parameters
+ * @param totalBuyerFeeBasisPoints Total buyer fees
+ * @param totalSellerFeeBasisPoints Total seller fees
+ */
+export function _validateFees(totalBuyerFeeBasisPoints: number, totalSellerFeeBasisPoints: number) {
+    const maxFeePercent = INVERSE_BASIS_POINT / 100
+
+    if (totalBuyerFeeBasisPoints > INVERSE_BASIS_POINT || totalSellerFeeBasisPoints > INVERSE_BASIS_POINT) {
+        throw new Error(`Invalid buyer/seller fees: must be less than ${maxFeePercent}%`)
+    }
+
+    if (totalBuyerFeeBasisPoints < 0 || totalSellerFeeBasisPoints < 0) {
+        throw new Error(`Invalid buyer/seller fees: must be at least 0%`)
+    }
+}
 
 export function generatePseudoRandomSalt() {
     return new BigNumber(new Date().getTime())
@@ -220,32 +231,38 @@ export async function _makeBuyOrder({
 
     // -------- Fee -----------
 
-    const {totalBuyerFeeBasisPoints, totalSellerFeeBasisPoints} = await computeFees({
-        asset: asset,
-        protocolFeePoint,
-        extraBountyBasisPoints,
-        side: OrderType.Buy
-    })
+    let totalSellerFeeBasisPoints = protocolFeePoint
 
+    if (asset.collection.royaltyFeePoint) {
+        totalSellerFeeBasisPoints = Number(protocolFeePoint) + Number(asset.collection.royaltyFeePoint)
+    }
+    _validateFees(0, totalSellerFeeBasisPoints)
     // OrderSide.Buy
     const feeRecipient = feeRecipientAddr
-    // const feeMethod = FeeMethod.SplitFee
 
-    const {
-        makerRelayerFee,
-        takerRelayerFee,
-        makerProtocolFee,
-        takerProtocolFee,
-        makerReferrerFee,
-        feeMethod
-    } = _getBuyFeeParameters(totalBuyerFeeBasisPoints, totalSellerFeeBasisPoints, sellOrder)
+    // takerRelayerFee=totalSellerFeeBasisPoints
+    let makerRelayerFee
+    let takerRelayerFee
+    if (sellOrder) {
+        // Use the sell order's fees to ensure compatiblity and force the order
+        // to only be acceptable by the sell order maker.
+        // Swap maker/taker depending on whether it's an English auction (taker)
+        // TODO add extraBountyBasisPoints when making bidder bounties
+        makerRelayerFee = sellOrder.waitingForBestCounterOrder
+            ? makeBigNumber(sellOrder.makerRelayerFee)
+            : makeBigNumber(sellOrder.takerRelayerFee)
+        takerRelayerFee = sellOrder.waitingForBestCounterOrder
+            ? makeBigNumber(sellOrder.takerRelayerFee)
+            : makeBigNumber(sellOrder.makerRelayerFee)
+    } else {
+        makerRelayerFee = makeBigNumber(0)
+        takerRelayerFee = makeBigNumber(totalSellerFeeBasisPoints)
+    }
+    const makerProtocolFee = makeBigNumber(0)
+    const takerProtocolFee = makeBigNumber(0)
+    const makerReferrerFee = makeBigNumber(0)
+    const feeMethod = FeeMethod.SplitFee
 
-    // const isMainnet = networkName == Network.Main
-    // const {staticTarget, staticExtradata} = await _getStaticCallTargetAndExtraData({
-    //     networkName,
-    //     asset,
-    //     useTxnOriginStaticCall: false
-    // })
 
     return {
         exchange: exchangeAddr,
@@ -335,41 +352,32 @@ export async function _makeSellOrder({
 
     // -------- Fee -----------
     const isPrivate = buyerAddress != NULL_ADDRESS
-    debugger
-    const {totalSellerFeeBasisPoints, totalBuyerFeeBasisPoints, sellerBountyBasisPoints} = await computeFees({
-        asset,
-        protocolFeePoint,
-        side: OrderType.Sell,
-        isPrivate,
-        extraBountyBasisPoints
-    })
 
-    debugger
+    let totalSellerFeeBasisPoints = protocolFeePoint
+
+    if (isPrivate) {
+        totalSellerFeeBasisPoints = 0
+    } else if (asset.collection.royaltyFeePoint) {
+        totalSellerFeeBasisPoints = protocolFeePoint + asset.collection.royaltyFeePoint
+    }
+    _validateFees(0, totalSellerFeeBasisPoints)
 
     // waitForHighestBid = false
     // Use buyer as the maker when it's an English auction, so Wyvern sets prices correctly
     const feeRecipient = waitForHighestBid ? NULL_ADDRESS : feeRecipientAddr
 
-    const {
-        makerRelayerFee,
-        takerRelayerFee,
-        makerProtocolFee,
-        takerProtocolFee,
-        makerReferrerFee,
-        feeMethod
-    } = _getSellFeeParameters(
-        totalBuyerFeeBasisPoints,
-        totalSellerFeeBasisPoints,
-        waitForHighestBid,
-        sellerBountyBasisPoints
-    )
+    // maker_relayer_fee: '1250', = totalSellerFeeBasisPoints
 
-    // const isMainnet = networkName == Network.Main
-    // const {staticTarget, staticExtradata} = await _getStaticCallTargetAndExtraData({
-    //     networkName,
-    //     asset,
-    //     useTxnOriginStaticCall: waitForHighestBid
-    // })
+    const makerRelayerFee = waitForHighestBid
+        ? makeBigNumber(0)
+        : makeBigNumber(totalSellerFeeBasisPoints)
+    const takerRelayerFee = waitForHighestBid
+        ? makeBigNumber(totalSellerFeeBasisPoints)
+        : makeBigNumber(0)
+    const makerProtocolFee = makeBigNumber(0)
+    const takerProtocolFee = makeBigNumber(0)
+    const makerReferrerFee = makeBigNumber(0)
+    const feeMethod = FeeMethod.SplitFee
 
 
     return {

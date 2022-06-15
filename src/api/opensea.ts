@@ -51,7 +51,6 @@ export class OpenseaAPI extends BaseFetch {
 
         try {
             //https://api-test.element.market/bridge/opensea/api/v1/assets?
-            // const json = await this.getQueryString('/api/v1/assets', queryUrl)
             const json = await this.getQueryString('/api/v1/assets', queryUrl)
 
             // json.assets.collection.dev_seller_fee_basis_points

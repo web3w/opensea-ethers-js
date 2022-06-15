@@ -25,32 +25,23 @@ const Test_API_CONFIG = {
         try {
 
             const chainId = 4
-            // const config = {proxyUrl: 'http://127.0.0.1:7890',protocolFeePoint:2}
             const config = Test_API_CONFIG[chainId]
             const sdk = new OpenseaExAgent({
                 chainId,
                 address: seller,
                 privateKeys: secrets.privateKeys
             }, config)
-
-            const query: AssetsQueryParams = {
-                assets: [{
-                    asset_contract_addresses: "0x88b48f654c30e99bc2e4a1559b4dcf1ad93fa656", //
-                    token_ids: "101812471375485254897399191407611800007244227253696807451733282608805056610305"
-                }]
-            }
-            const assets = await sdk.api.getAssets(query)
-
-            const sellAsset =   assets.map((val) => ({
+            const val = (await sdk.getOwnerAssets()) [0]
+            const sellAsset = {
                 tokenId: val.token_id,
                 tokenAddress: val.address,
                 schemaName: val.schema_name,
                 collection: {
-                    transferFeeAddress: val.royaltyFeeAddress || "",
-                    elementSellerFeeBasisPoints: Number(val.royaltyFeeAddress)
+                    royaltyFeeAddress: val.royaltyFeeAddress,
+                    royaltyFeePoint: val.royaltyFeePoint
                 }
-            }))[0]
-            if(!sellAsset) throw "error"
+            }
+            if (!sellAsset) throw "error"
 
             // paymentToken: sellEx.contracts.ETH,
             const sellParams = {
@@ -58,13 +49,19 @@ const Test_API_CONFIG = {
                 startAmount: 0.0001,
             } as SellOrderParams
 
-            const sellData = await sdk.createSellOrder(sellParams)
-            // const sellData = await sellEx.createBuyOrder(sellParams)
-
-            const foo = await sdk.api.postOrder(JSON.stringify(sellData)).catch((e: any) => {
+            const buyData = await sdk.createBuyOrder(sellParams)
+            const buyOrder = await sdk.api.postOrder(JSON.stringify(buyData)).catch((e: any) => {
                 console.log('eee', e.message)
             })
-            console.log('success', foo)
+            console.log('success buyOrder', buyOrder.id)
+
+            const sellData = await sdk.createSellOrder(sellParams)
+
+
+            const sellOrder = await sdk.api.postOrder(JSON.stringify(sellData)).catch((e: any) => {
+                console.log('eee', e.message)
+            })
+            console.log('success sellOrder', sellOrder.id)
             return
 
             // const orderQuery = {
@@ -75,8 +72,6 @@ const Test_API_CONFIG = {
             // console.log(orders)
 
             // const tx = await buyEx.matchOrder(JSON.stringify(orders[0]))
-
-
 
 
             const assetsQuery = {

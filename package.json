@@ -25,8 +25,8 @@
     "node-fetch": "^2.6.7",
     "query-string": "^7.1.1",
     "tls": "^0.0.1",
-    "web3-accounts": "1.1.24",
-    "web3-wallets": "^2.0.13"
+    "web3-accounts": "1.1.31",
+    "web3-wallets": "^2.0.17"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.16.7",
