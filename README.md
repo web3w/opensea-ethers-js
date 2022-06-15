@@ -17,7 +17,7 @@ npm i opensea-ethers-js
 To get started, create a new OpenSeaJS client, called an OpenSeaPort 🚢, using your chainId and address:
 
 ```JavaScript
-import {OpenSeaPort, Network} from 'opensea-ehters-js'
+import {OpenseaExAgent} from 'opensea-ehters-js'
 
 const seaport = new OpenseaExAgent({
     chainId: 4,
@@ -94,7 +94,7 @@ const assetsQuery = {
     include_orders: true,
 } as AssetsQueryParams
 
-const asset: OpenSeaAsset = await seaport.api.getAssets(assetsQuery) 
+const asset = await seaport.api.getAssets(assetsQuery) 
 ```
 
 #### Checking Balances and Ownerships
