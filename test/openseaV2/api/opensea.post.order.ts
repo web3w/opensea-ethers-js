@@ -3,7 +3,7 @@ import {SellOrderParams} from "web3-accounts";
 import * as secrets from '../../../../secrets.json'
 import {OpenseaExAgent} from "../../../src/openseaEx/openseaExAgent";
 import {asset721} from "../../assets";
-import {AssetsQueryParams} from "element-sdk";
+import {AssetsQueryParams} from "../../../src/openseaEx/types";
 
 
 const seller = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
@@ -34,14 +34,6 @@ const Test_API_CONFIG = {
                 privateKeys: secrets.privateKeys
             }, config)
 
-            const buyEx = new OpenseaExAgent({
-                chainId,
-                address: buyer,
-                privateKeys: secrets.privateKeys
-            }, config)
-
-
-
 
             const sellAsset = asset721[chainId][1]
 
@@ -67,7 +59,7 @@ const Test_API_CONFIG = {
             const {orders} = await sellEx.api.getOrders(query)
             console.log(orders)
 
-            const tx = await buyEx.matchOrder(JSON.stringify(orders[0]))
+            const tx = await sellEx.matchOrder(JSON.stringify(orders[0]))
 
 
 

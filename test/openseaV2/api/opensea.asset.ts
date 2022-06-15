@@ -7,8 +7,8 @@ const buyer = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
 const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 
 import {asset1155} from "../../assets";
-import {AssetsQueryParams} from "element-sdk";
 import {OpenseaExAgent} from "../../../src/openseaEx/openseaExAgent";
+import {AssetsQueryParams} from "../../../src/openseaEx/types";
 
 //https://api-test.element.market/bridge/opensea
 ;(async () => {
@@ -32,13 +32,22 @@ import {OpenseaExAgent} from "../../../src/openseaEx/openseaExAgent";
 
             const query: AssetsQueryParams = {
                 assets: [{
-                    asset_contract_addresses: sellAsset.tokenAddress, //
-                    token_ids: sellAsset.tokenId
+                    asset_contract_addresses: "0x5f069e9e7311da572299533b7078859085f7d82c", //
+                    token_ids: "7"
                 }]
             }
+
+
+            const owner = await sdk.getOwnerAssets()
+            console.log(owner)
+            const fees = await sdk.getAssetsFees(query)
+            console.log(fees)
+
+
             const assets = await sdk.api.getAssets(query)
 
             console.log(assets)
+
 
             // await buyEx.exAgent.acceptOrder(JSON.stringify(sellData))
         } catch (e) {

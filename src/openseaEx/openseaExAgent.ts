@@ -13,7 +13,15 @@ import {
     SellOrderParams
 } from "web3-accounts"
 
-import {WalletInfo, LimitedCallSpec, BigNumber, NULL_ADDRESS} from "./types"
+import {
+    WalletInfo,
+    LimitedCallSpec,
+    BigNumber,
+    NULL_ADDRESS,
+    AssetsQueryParams,
+    AssetCollection,
+    FeesInfo
+} from "./types"
 
 import {OpenseaEx} from "./openseaEx";
 import {OpenseaAPI} from "../api/opensea";
@@ -118,6 +126,28 @@ export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
 
     async transfer(asset: Asset, to: string, quantity: number) {
         return this.contracts.userAccount.transfer(asset, to, quantity)
+    }
+
+    async getOwnerAssets(tokens?: AssetsQueryParams): Promise<AssetCollection[]> {
+        if (tokens) {
+            tokens.owner = tokens.owner || this.walletInfo.address
+        } else {
+            tokens = {
+                owner: this.walletInfo.address,
+                limit: 1,
+            }
+        }
+        return this.api.getAssets(tokens)
+    }
+
+    async getAssetsFees(tokens: AssetsQueryParams): Promise<FeesInfo[]> {
+        const assets: AssetCollection[] = await this.api.getAssets(tokens)
+        return assets.map(val => (<FeesInfo>{
+            royaltyFeeAddress: val.royaltyFeeAddress,
+            royaltyFeePoint: val.royaltyFeePoint,
+            protocolFeePoint: val.protocolFeePoint,
+            protocolFeeAddress: this.contracts.feeRecipientAddress
+        }))
     }
 
     async createLowerPriceOrder(params: LowerPriceOrderParams): Promise<any> {

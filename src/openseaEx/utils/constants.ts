@@ -15,6 +15,7 @@ export const OPENSEA_API_CONFIG = {
     }
 }
 
+
 export const MAX_DIGITS_IN_UNSIGNED_256_INT = 78 // 78 solt
 
 export const DEFAULT_EXPIRATION_TIME = (86400 * 30); //1天= 86400 s

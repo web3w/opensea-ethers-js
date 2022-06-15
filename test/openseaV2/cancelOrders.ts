@@ -1,5 +1,11 @@
 import * as secrets from '../../../secrets.json'
-import {Asset, assetToMetadata, ExchangeMetadata, LowerPriceOrderParams, SellOrderParams, Token} from "web3-accounts";
+import {
+    Asset,
+    assetToMetadata,
+    SellOrderParams,
+    tokenToMetadata,
+    Token
+} from "web3-accounts";
 
 import {asset721, erc20Tokens} from "../assets";
 import {OpenseaEx} from "../../src/openseaEx/openseaEx";
@@ -10,7 +16,7 @@ const rpcUrl = 'https://api-test.element.market/api/v1/jsonrpc'
 const buyer = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401';
 const seller = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A';
 
-const newGuy= '0xB678bAC834679CF1E3B2d5d2Dd21319447d42861'
+// const newGuy = '0xB678bAC834679CF1E3B2d5d2Dd21319447d42861'
 const chainId = 4
 const asset = asset721[chainId][0] as Asset
 const token = erc20Tokens[chainId][0] as Token
@@ -18,7 +24,7 @@ const token = erc20Tokens[chainId][0] as Token
 
 const eleAgent = new OpenseaExAgent({
     chainId,
-    address: newGuy,
+    address: seller,
     privateKeys: secrets.privateKeys
 });
 
@@ -33,19 +39,6 @@ const buySDK = new OpenseaEx({
     address: buyer,
     privateKeys: secrets.privateKeys
 });
-
-export function tokenToMetadata(token: Token, quantity: string = "1", data?: string): ExchangeMetadata {
-    return <ExchangeMetadata>{
-        asset: {
-            id: undefined,
-            address: token.address,
-            quantity,
-            data
-        },
-        schema: 'ERC20'
-    }
-}
-
 
 ;(async () => {
         // const tokenBal = await eleSDK.getUserTokenBalance(token.address, token.decimals)
@@ -71,10 +64,9 @@ export function tokenToMetadata(token: Token, quantity: string = "1", data?: str
             const cancelOrderTx = await eleSDK.cancelOrders([sellOrderStr])
             await cancelOrderTx.wait()
 
-            const buyTx = await buySDK.acceptOrder(sellOrderStr)
+            const buyTx = await buySDK.matchOrder(sellOrderStr)
             await buyTx.wait()
             console.log('Buy success', buyTx.hash)
-
 
 
             // const order = await eleSDK.postOrder(sellOrderStr, {standard})

@@ -219,6 +219,7 @@ export async function _makeBuyOrder({
     const times = getTimeParameters(expirationTime)
 
     // -------- Fee -----------
+
     const {totalBuyerFeeBasisPoints, totalSellerFeeBasisPoints} = await computeFees({
         asset: asset,
         protocolFeePoint,
@@ -334,6 +335,7 @@ export async function _makeSellOrder({
 
     // -------- Fee -----------
     const isPrivate = buyerAddress != NULL_ADDRESS
+    debugger
     const {totalSellerFeeBasisPoints, totalBuyerFeeBasisPoints, sellerBountyBasisPoints} = await computeFees({
         asset,
         protocolFeePoint,
@@ -341,6 +343,8 @@ export async function _makeSellOrder({
         isPrivate,
         extraBountyBasisPoints
     })
+
+    debugger
 
     // waitForHighestBid = false
     // Use buyer as the maker when it's an English auction, so Wyvern sets prices correctly

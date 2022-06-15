@@ -1,7 +1,6 @@
 import {Schema, SchemaValidator, schemas} from './src'
 import {BigNumber} from 'web3-wallets'
 import * as _ from 'lodash'
-import * as validUrl from 'valid-url'
 
 export {schemas}
 const HEX_REGEX = /^0x[0-9A-F]*$/i
@@ -88,14 +87,6 @@ export const assert = {
                   Encountered: ${JSON.stringify(value, null, '\t')}
                   Validation errors: ${validationResult.errors.join(', ')}`
         assert.assert(!hasValidationErrors, msg)
-    },
-    isWebUri(variableName: string, value: any): void {
-        const isValidUrl = validUrl.isWebUri(value) !== undefined
-        assert.assert(isValidUrl, assert.typeAssertionMessage(variableName, 'web uri', value))
-    },
-    isUri(variableName: string, value: any): void {
-        const isValidUri = validUrl.isUri(value) !== undefined
-        assert.assert(isValidUri, assert.typeAssertionMessage(variableName, 'uri', value))
     },
     isBlockParam(variableName: string, value: any): void {
         if (Number.isInteger(value) && value >= 0) {

@@ -31,6 +31,7 @@ export class OpenseaAPI extends BaseFetch {
         }
     }
 
+    //https://docs.opensea.io/reference/getting-assets
     public async getAssets(queryParams: AssetsQueryParams, retries = 2): Promise<AssetCollection[]> {
         const {owner, include_orders, limit, assets} = queryParams
         const list = assets ? assets.map((val: any) => {
@@ -49,10 +50,17 @@ export class OpenseaAPI extends BaseFetch {
             : QueryString.stringify(query)
 
         try {
+            //https://api-test.element.market/bridge/opensea/api/v1/assets?
+            // const json = await this.getQueryString('/api/v1/assets', queryUrl)
             const json = await this.getQueryString('/api/v1/assets', queryUrl)
+
+            // json.assets.collection.dev_seller_fee_basis_points
+            // json.assets.asset_contract.dev_seller_fee_basis_points
             return json.assets.map(val => ({
                 ...val.asset_contract,
-                buy_orders: val.buy_orders,
+                royaltyFeePoint: Number(val.collection?.dev_seller_fee_basis_points),
+                protocolFeePoint: Number(val.collection?.opensea_seller_fee_basis_points),
+                royaltyFeeAddress: val.collection?.payout_address,
                 sell_orders: val.sell_orders,
                 token_id: val.token_id
             }))
