@@ -1,7 +1,7 @@
 import * as secrets from '../../../secrets.json'
 import {SwapEx} from "../../src/swapEx/swapEx";
-import {OpenseaExAgent} from "../../lib";
 import {SellOrderParams} from "web3-accounts";
+import {OpenSeaSDK} from "../../src/index";
 
 const rpcUrl = 'https://api-test.element.market/api/v1/jsonrpc'
 const seller = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
@@ -9,7 +9,7 @@ const buyer = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 
 
 ;(async () => {
-        const sellEx = new OpenseaExAgent({
+        const sellEx = new OpenSeaSDK({
             chainId: 4,
             address: seller,
             privateKeys: secrets.privateKeys,

@@ -6,17 +6,6 @@ export type MintableToken = {
     creatorIndexMaxSupply: number
 }
 
-export function converStringToBytes(metadata: string):string {
-    let bytes = '0x';
-    // https://ipfs.io/ipfs/QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/1
-    // const metadata = "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/" + id;
-    for (let i = 0; i < metadata.length; i++) {
-        bytes += metadata.charCodeAt(i).toString(16);
-    }
-    // console.log("metadata : ", bytes);
-    return bytes;
-}
-
 
 // https://opensea.io/assets/0x495f947276749ce646f68ac8c248420045cb7b5e/105886420831251411528890303004419979784764244768332317573040781519418810171393
 

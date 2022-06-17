@@ -63,7 +63,7 @@ export const EXSWAP_CONTRACTS_ADDRESSES = {
     1: {
         ExSwap: "0x69Cf8871F61FB03f540bC519dd1f1D4682Ea0bF6",
         0: '0x7f268357A8c2552623316e2562D90e642bB538E5', // opensea
-        1: '0x74d8e56924909731d0e65F954fc439Fa04634a61', //elementV1
+        1: '0x00000000006c3852cbef3e08e8df289169ede581', //elementV1
         2: '0x20F780A973856B93f63670377900C1d2a50a77c4' // //elementV3
     },
     4: {

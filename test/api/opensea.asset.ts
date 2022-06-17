@@ -1,14 +1,13 @@
-import * as secrets from '../../../../secrets.json'
-import {OpenseaAPI} from "../../../src/api/opensea";
-
+import * as secrets from '../../../secrets.json'
+import {OpenseaAPI} from "../../src/api/opensea";
 
 const rpcUrl = 'https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'
 const buyer = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
 const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 
-import {asset1155} from "../../assets";
-import {OpenseaExAgent} from "../../../src/openseaEx/openseaExAgent";
-import {AssetsQueryParams} from "../../../src/openseaEx/types";
+import {asset1155} from "../assets";
+import {OpenSeaSDK} from "../../src/index";
+import {AssetsQueryParams} from "../../src/types";
 
 //https://api-test.element.market/bridge/opensea
 ;(async () => {
@@ -23,7 +22,7 @@ import {AssetsQueryParams} from "../../../src/openseaEx/types";
                 proxyUrl: 'http://127.0.0.1:7890'
             })
 
-            const sdk = new OpenseaExAgent({chainId, address: seller}, {
+            const sdk = new OpenSeaSDK({chainId, address: seller}, {
                 proxyUrl: 'http://127.0.0.1:7890'
             })
 

@@ -17,9 +17,9 @@ npm i opensea-ethers-js
 To get started, create a new OpenSeaJS client, called an OpenSeaPort 🚢, using your chainId and address:
 
 ```JavaScript
-import {OpenseaExAgent} from 'opensea-ehters-js'
+import {OpenSeaSDK} from 'opensea-ehters-js'
 
-const seaport = new OpenseaExAgent({
+const seaport = new OpenSeaSDK({
     chainId: 4,
     address: "0x9F7A946d935c8Efc7A8329C0d894A69bA241345A"
 })

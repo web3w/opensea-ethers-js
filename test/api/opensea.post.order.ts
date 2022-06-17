@@ -1,10 +1,9 @@
 import {SellOrderParams} from "web3-accounts";
 
-import * as secrets from '../../../../secrets.json'
-import {OrdersQueryParams} from "../../../src/openseaEx/types";
-import {OpenseaExAgent} from "../../../src/openseaEx/openseaExAgent";
-import {asset721} from "../../assets";
-import {AssetsQueryParams} from "element-sdk";
+import * as secrets from '../../../secrets.json'
+import {Seaport} from "../../../src/openseaEx/openseaExAgent";
+import {asset721} from "../assets";
+import {AssetsQueryParams} from "../../src/types";
 
 
 const seller = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
@@ -29,28 +28,14 @@ const Test_API_CONFIG = {
             const chainId = 4
             // const config = {proxyUrl: 'http://127.0.0.1:7890',protocolFeePoint:2}
             const config = Test_API_CONFIG[chainId]
-            const sellEx = new OpenseaExAgent({
+            const sellEx = new Seaport({
                 chainId,
                 address: seller,
                 privateKeys: secrets.privateKeys
             }, config)
 
-            const buyEx = new OpenseaExAgent({
-                chainId,
-                address: buyer,
-                privateKeys: secrets.privateKeys
-            }, config)
 
             const sellAsset = asset721[chainId][1]
-
-            const query = {
-                asset_contract_address: sellAsset.tokenAddress, //
-                token_ids: [sellAsset.tokenId]
-            } as OrdersQueryParams
-            const {orders} = await sellEx.api.getOrders(query)
-            console.log(orders)
-
-            const tx = await buyEx.matchOrder(JSON.stringify(orders[0]))
 
             // paymentToken: sellEx.contracts.ETH,
             const sellParams = {
@@ -65,6 +50,16 @@ const Test_API_CONFIG = {
                 console.log('eee', e.message)
             })
             console.log('success', foo)
+            return
+
+            const query = {
+                asset_contract_address: sellAsset.tokenAddress, //
+                token_ids: [sellAsset.tokenId]
+            }
+            const {orders} = await sellEx.api.getOrders(query)
+            console.log(orders)
+
+            const tx = await sellEx.matchOrder(JSON.stringify(orders[0]))
 
 
 

@@ -3,7 +3,7 @@ import EventEmitter from 'events'
 import {
     OPENSEA_CONTRACTS_ADDRESSES,
     OpenseaABI,
-} from '../contracts/index'
+} from './contracts/index'
 
 import {
     Web3Accounts,
@@ -41,10 +41,10 @@ import {
 import {ElementError} from "./utils/error";
 import {metadataToAsset, getWyvOrderParams, getEIP712TypedData} from "./utils/helper";
 import {DEFAULT_EXPIRATION_TIME, DEFAULT_LISTING_TIME, DEFAULT_SELLER_FEE_BASIS_POINTS} from "./utils/constants";
-import {assert, schemas} from "../assert/index";
+import {assert, schemas} from "./assert/index";
 
 
-export class OpenseaEx extends EventEmitter {
+export class Seaport extends EventEmitter {
     public walletInfo: WalletInfo
     public protocolFeePoint = DEFAULT_SELLER_FEE_BASIS_POINTS
     // address
@@ -389,7 +389,7 @@ export class OpenseaEx extends EventEmitter {
 
     public async creatSignedOrder(
         {unHashOrder}: { unHashOrder: UnhashedOrder }
-    ): Promise<any> {
+    ): Promise<OrderJSON> {
         const hash = await this.hashToSign_(unHashOrder)
 
         // const expirationTime = parseInt((new Date().getTime() / 1000) + (60 * 60 * 24 * 10))
@@ -638,7 +638,7 @@ export class OpenseaEx extends EventEmitter {
             data: data.data
         } as LimitedCallSpec
         const rpcUrl = this.walletInfo.rpcUrl?.url || await getChainRpcUrl(this.walletInfo.chainId)
-        const gas = await getEstimateGas(rpcUrl, callData)
+        // const gas = await getEstimateGas(rpcUrl, callData)
         // console.log(gas)
         return ethSend(this.walletInfo, callData)
     }

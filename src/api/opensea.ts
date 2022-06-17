@@ -1,6 +1,6 @@
 import {BaseFetch, sleep} from "web3-accounts";
-import {orderToJSON} from "../openseaEx/utils/makeOrder";
-import {openseaOrderFromJSON} from "../openseaEx/utils/helper";
+import {orderToJSON} from "../utils/makeOrder";
+import {openseaOrderFromJSON} from "../utils/helper";
 import QueryString from "querystring";
 import {
     AssetCollection,
@@ -8,9 +8,9 @@ import {
     AssetsQueryParams,
     APIConfig,
     OrderType, OrderJSON
-} from "../openseaEx/types";
+} from "../types";
 
-import {OPENSEA_API_TIMEOUT, OPENSEA_API_CONFIG, ORDERS_PATH, OPENSEA_API_KEY} from "../openseaEx/utils/constants";
+import {OPENSEA_API_TIMEOUT, OPENSEA_API_CONFIG, ORDERS_PATH, OPENSEA_API_KEY} from "../utils/constants";
 import {assert, schemas} from "../assert/index";
 
 export class OpenseaAPI extends BaseFetch {

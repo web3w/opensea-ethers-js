@@ -3,10 +3,9 @@ export type {
     AssetsQueryParams,
     OrdersQueryParams,
     AssetCollection,
+    FeesInfo,
     OrderJSON
-} from './src/openseaEx/types'
-export {OrderType} from './src/openseaEx/types'
-
-export {OpenseaEx} from './src/openseaEx/openseaEx'
-export {OpenseaExAgent} from './src/openseaEx/openseaExAgent'
+} from './src/types'
+export {OrderType} from './src/types'
+export {OpenSeaSDK} from './src/index'
 export {SwapEx} from './src/swapEx/swapEx'

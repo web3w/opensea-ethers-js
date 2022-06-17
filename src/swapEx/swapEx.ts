@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import {Contract, ethers} from 'ethers'
-import {OpenseaExAgent} from '../openseaEx/openseaExAgent'
+import {OpenSeaSDK} from '../index'
 import {
     EXSWAP_CONTRACTS_ADDRESSES,
     ContractABI
@@ -44,19 +44,6 @@ export interface ExSwapTradeData {
 
 
 function getValidSwaps(intData: number, swaps: Array<TradeDetails>) {
-    // console.log(err)
-    // debugger
-    // const data = err.data
-    // if (err.error.data) {
-    //     // metamask
-    //     data = err.error.data.originalError.data
-    // } else {
-    //     // ethers
-    //     data = err.error.error.data
-    // }
-
-    // const intData = parseInt(data, 16)
-    // if (intData == 0) throw 'No valid swaps data by simulate'
     let bData = intData.toString(2)
 
     if (bData.length != swaps.length) {
@@ -153,7 +140,7 @@ export class SwapEx extends EventEmitter {
 
     public async buyOpenSeaWithETH(orders: string[]) {
         const marketId = '0'
-        const openseaEx = new OpenseaExAgent(this.walletInfo)
+        const sdk = new OpenSeaSDK(this.walletInfo)
         const tradeDatas: TradeDetails[] = []
         for (const orderStr of orders) {
             const params = {
@@ -161,7 +148,7 @@ export class SwapEx extends EventEmitter {
                 makerAddress: this.swapExContract.address,
                 assetRecipientAddress: this.walletInfo.address
             }
-            const {callData} = await openseaEx.getMatchCallData(params)
+            const {callData} = await sdk.getMatchCallData(params)
             console.log('buyOneOpenSeaWithETH', callData.value)
             tradeDatas.push(<TradeDetails>{
                 marketId,
@@ -175,13 +162,13 @@ export class SwapEx extends EventEmitter {
 
     public async buyOneOpenSeaWithETH(orderStr: string) {
         const marketId = '0'
-        const openseaEx = new OpenseaExAgent(this.walletInfo)
+        const sdk = new OpenSeaSDK(this.walletInfo)
         const params = {
             orderStr,
             makerAddress: this.swapExContract.address,
             assetRecipientAddress: this.walletInfo.address
         }
-        const {callData} = await openseaEx.getMatchCallData(params)
+        const {callData} = await sdk.getMatchCallData(params)
         console.log('buyOneOpenSeaWithETH', callData.value)
 
         const value = ethers.BigNumber.from(callData.value)

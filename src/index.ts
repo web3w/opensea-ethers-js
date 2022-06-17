@@ -23,12 +23,13 @@ import {
     FeesInfo
 } from "./types"
 
-import {OpenseaEx} from "./openseaEx";
-import {OpenseaAPI} from "../api/opensea";
+import {Seaport} from "./seaport";
+import {OpenseaAPI} from "./api/opensea";
 import {Asset} from "web3-accounts/lib/src/types";
+import {detectWallets} from "web3-wallets";
 
-export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
-    public contracts: OpenseaEx
+export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
+    public contracts: Seaport
     public walletInfo: WalletInfo
     public api: OpenseaAPI
 
@@ -39,7 +40,7 @@ export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
         if (config) {
             conf = {...conf, ...config}
         }
-        this.contracts = new OpenseaEx(wallet, conf)
+        this.contracts = new Seaport(wallet, conf)
         this.api = new OpenseaAPI(conf)
         this.walletInfo = wallet
     }
@@ -150,6 +151,7 @@ export class OpenseaExAgent extends EventEmitter implements ExchangetAgent {
         }))
     }
 
+    //TODO
     async createLowerPriceOrder(params: LowerPriceOrderParams): Promise<any> {
         return Promise.resolve()
     }

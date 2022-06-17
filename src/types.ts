@@ -6,7 +6,7 @@ import {
     ExchangeMetadata,
     APIConfig
 } from "web3-accounts"
-import {BigNumber} from 'web3-wallets'
+import {BigNumber, ECSignature} from 'web3-wallets'
 
 export {
     NULL_BLOCK_HASH,
@@ -24,7 +24,7 @@ export type {Signature, WalletInfo, LimitedCallSpec, EIP712TypedData, EIP712Doma
 
 
 export {OrderType}
-export type {Asset, Token, APIConfig, ExchangeMetadata}
+export type {Asset, Token, APIConfig, ExchangeMetadata, ECSignature}
 
 export interface OrdersQueryParams {
     token_ids: string[]
@@ -66,98 +66,6 @@ export interface AssetCollection extends FeesInfo {
     nft_version?: string
     created_date?: string
     sell_orders?: any
-}
-
-export interface ElementRoyaltyInfo {
-    transferFeeAddress: string
-    elementSellerFeeBasisPoints: number
-}
-
-
-
-// https://testnets-api.opensea.io/api/v1/assets?include_orders=true&owner=0x9f7a946d935c8efc7a8329c0d894a69ba241345a&limit=50&asset_contract_addresses=0x4cddbf865ee2a1a3711648bb192e285f290f7985&token_ids=4676314080394472507455332797632474230665182066565445726959043747700191264868&asset_contract_addresses=0xb556f251eacbec4badbcddc4a146906f2c095bee&token_ids=2&asset_contract_addresses=0x5fecbbbaf9f3126043a48a35eb2eb8667d469d53&token_ids=719455&asset_contract_addresses=0xb556f251eacbec4badbcddc4a146906f2c095bee&token_ids=3
-/**
- * Full annotated Fungible Token spec with OpenSea metadata
- */
-// export interface ElemetnFungibleToken extends Token {
-//     imageUrl?: string
-//     ethPrice?: string
-//     usdPrice?: string
-// }
-
-
-//----------- OrderJSON--------------
-export interface ECSignature {
-    v: number
-    r: string
-    s: string
-}
-
-export interface OrderJSON extends Partial<ECSignature> {
-    exchange: string
-    maker: string
-    taker: string
-    makerRelayerFee: string
-    takerRelayerFee: string
-    makerProtocolFee: string
-    takerProtocolFee: string
-    makerReferrerFee: string
-    feeRecipient: string
-    feeMethod: number
-    side: number
-    saleKind: number
-    target: string
-    howToCall: number
-    calldata: string
-    replacementPattern: string
-    staticTarget: string
-    staticExtradata: string
-    paymentToken: string
-    quantity: string
-    basePrice: string
-    englishAuctionReservePrice: string | undefined
-    extra: string
-
-    // createdTime is undefined when order hasn't been posted yet
-    // createdTime?: number | string
-    listingTime: number | string
-    expirationTime: number | string
-
-    salt: string
-
-    metadata: ExchangeMetadata
-
-    hash: string
-    nonce?: number | string
-    orderHash?: string
-    chain?: string
-    chainId?: string
-}
-
-export interface BaseOrder {
-    exchange: string
-    maker: string
-    taker: string
-    makerRelayerFee: BigNumber
-    takerRelayerFee: BigNumber
-    makerProtocolFee: BigNumber
-    takerProtocolFee: BigNumber
-    feeRecipient: string
-    feeMethod: number
-    side: number
-    saleKind: number
-    target: string
-    howToCall: number
-    calldata: string
-    replacementPattern: string
-    staticTarget: string
-    staticExtradata: string
-    paymentToken: string
-    basePrice: BigNumber
-    extra: BigNumber
-    listingTime: BigNumber
-    expirationTime: BigNumber
-    salt: BigNumber
 }
 
 export enum FeeMethod {
@@ -245,49 +153,9 @@ export interface Order extends UnsignedOrder, Partial<ECSignature> {
 }
 
 
-/******************** Fees ***********************/
-/**
- * The basis point values of each type of fee
- */
-export interface OpenSeaFees {
-    // Fee for Element levied on sellers
-    elementSellerFeeBasisPoints: number
-    // Fee for Element levied on buyers
-    elementBuyerFeeBasisPoints: number
-    // Fee for the collection owner levied on sellers
-    devSellerFeeBasisPoints: number
-    // Fee for the collection owner levied on buyers
-    devBuyerFeeBasisPoints: number
-}
-
-/**
- * Fully computed fees including bounties and transfer fees
- */
-export interface ComputedFees extends OpenSeaFees {
-    // Total fees. dev + element
-    totalBuyerFeeBasisPoints: number
-    totalSellerFeeBasisPoints: number
-
-    // Fees that the item's creator takes on every transfer
-    transferFee: BigNumber
-    transferFeeTokenAddress: string | null
-
-    // Fees that go to whoever refers the order to the taker.
-    // Comes out of OpenSea fees
-    sellerBountyBasisPoints: number
-}
-
-
 export interface UnsignedOrder extends UnhashedOrder {
     hash: string
     nonce?: string | number
-}
-
-//----------- OrderJSON--------------
-export interface ECSignature {
-    v: number
-    r: string
-    s: string
 }
 
 export interface OrderJSON extends Partial<ECSignature> {
@@ -329,5 +197,31 @@ export interface OrderJSON extends Partial<ECSignature> {
     orderHash?: string
     chain?: string
     chainId?: string
+}
+
+export interface BaseOrder {
+    exchange: string
+    maker: string
+    taker: string
+    makerRelayerFee: BigNumber
+    takerRelayerFee: BigNumber
+    makerProtocolFee: BigNumber
+    takerProtocolFee: BigNumber
+    feeRecipient: string
+    feeMethod: number
+    side: number
+    saleKind: number
+    target: string
+    howToCall: number
+    calldata: string
+    replacementPattern: string
+    staticTarget: string
+    staticExtradata: string
+    paymentToken: string
+    basePrice: BigNumber
+    extra: BigNumber
+    listingTime: BigNumber
+    expirationTime: BigNumber
+    salt: BigNumber
 }
 

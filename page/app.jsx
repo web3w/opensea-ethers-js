@@ -4,7 +4,6 @@ import {createRoot} from 'react-dom/client';
 
 import {MainLayout} from './components/index'
 import {AppContext,Context} from './components/AppContext'
-// import {ConfigProvider} from 'antd';
 
 const root = createRoot(document.getElementById('root'));
 

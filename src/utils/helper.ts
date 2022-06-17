@@ -1,7 +1,5 @@
 import {
     ECSignature,
-    UnhashedOrder,
-    UnsignedOrder,
     BigNumber,
     OrderJSON,
     Asset,
@@ -9,7 +7,6 @@ import {
     NULL_ADDRESS,
     ExchangeMetadata
 } from '../types'
-import {assert, schemas} from "../../assert/index";
 
 export function toBaseUnitAmount(amount: BigNumber, decimals: number): BigNumber {
     const unit = new BigNumber(10).pow(decimals)

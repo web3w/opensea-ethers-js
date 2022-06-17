@@ -1,13 +1,13 @@
-import * as secrets from '../../../secrets.json'
+import * as secrets from '../../secrets.json'
 import {ETHToken, SellOrderParams} from "web3-accounts";
-import {OpenseaExAgent} from "../../src/openseaEx/openseaExAgent";
+import {Seaport} from "../../src/openseaEx/openseaExAgent";
 
 const buyer = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
 const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 
 
 ;(async () => {
-        const buyEx = new OpenseaExAgent({
+        const buyEx = new Seaport({
             chainId: 4,
             address: buyer,
             privateKeys: secrets.privateKeys

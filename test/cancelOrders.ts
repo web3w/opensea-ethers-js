@@ -1,4 +1,4 @@
-import * as secrets from '../../../secrets.json'
+import * as secrets from '../../secrets.json'
 import {
     Asset,
     assetToMetadata,
@@ -7,9 +7,8 @@ import {
     Token
 } from "web3-accounts";
 
-import {asset721, erc20Tokens} from "../assets";
-import {OpenseaEx} from "../../src/openseaEx/openseaEx";
-import {OpenseaExAgent} from "../../index";
+import {asset721, erc20Tokens} from "./assets";
+import {OpenSeaSDK} from "../index";
 
 const rpcUrl = 'https://api-test.element.market/api/v1/jsonrpc'
 
@@ -22,19 +21,19 @@ const asset = asset721[chainId][0] as Asset
 const token = erc20Tokens[chainId][0] as Token
 
 
-const eleAgent = new OpenseaExAgent({
+const eleAgent = new OpenSeaSDK({
     chainId,
     address: seller,
     privateKeys: secrets.privateKeys
 });
 
-const eleSDK = new OpenseaEx({
+const eleSDK = new OpenSeaSDK({
     chainId,
     address: seller,
     privateKeys: secrets.privateKeys
 });
 
-const buySDK = new OpenseaEx({
+const buySDK = new OpenSeaSDK({
     chainId,
     address: buyer,
     privateKeys: secrets.privateKeys
