@@ -23,13 +23,13 @@ import {
     FeesInfo
 } from "./types"
 
-import {Seaport} from "./seaport";
+import {OpenSea} from "./opensea";
 import {OpenseaAPI} from "./api/opensea";
 import {Asset} from "web3-accounts/lib/src/types";
 import {detectWallets} from "web3-wallets";
 
 export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
-    public contracts: Seaport
+    public contracts: OpenSea
     public walletInfo: WalletInfo
     public api: OpenseaAPI
 
@@ -40,7 +40,7 @@ export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
         if (config) {
             conf = {...conf, ...config}
         }
-        this.contracts = new Seaport(wallet, conf)
+        this.contracts = new OpenSea(wallet, conf)
         this.api = new OpenseaAPI(conf)
         this.walletInfo = wallet
     }

@@ -44,7 +44,7 @@ import {DEFAULT_EXPIRATION_TIME, DEFAULT_LISTING_TIME, DEFAULT_SELLER_FEE_BASIS_
 import {assert, schemas} from "./assert/index";
 
 
-export class Seaport extends EventEmitter {
+export class OpenSea extends EventEmitter {
     public walletInfo: WalletInfo
     public protocolFeePoint = DEFAULT_SELLER_FEE_BASIS_POINTS
     // address
