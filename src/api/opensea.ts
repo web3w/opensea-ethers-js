@@ -110,7 +110,7 @@ export class OpenseaAPI extends BaseFetch {
         try {
             const opts = {
                 headers: {
-                    'X-API-KEY': this.apiKey || "))))"
+                    'X-API-KEY': this.apiKey || OPENSEA_API_KEY
                 }
             }
             const result = await this.post(
