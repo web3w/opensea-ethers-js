@@ -1,17 +1,17 @@
-import {BaseFetch, sleep} from "web3-accounts";
+import QueryString from "querystring";
 import {orderToJSON} from "../utils/makeOrder";
 import {openseaOrderFromJSON} from "../utils/helper";
-import QueryString from "querystring";
+
 import {
     AssetCollection,
     OrdersQueryParams,
     AssetsQueryParams,
-    APIConfig,
-    OrderType, OrderJSON
+    APIConfig, OrderJSON, OrderSide, sleep, BaseFetch
 } from "../types";
 
 import {OPENSEA_API_TIMEOUT, OPENSEA_API_CONFIG, ORDERS_PATH, OPENSEA_API_KEY} from "../utils/constants";
 import {assert, schemas} from "../assert/index";
+
 
 export class OpenseaAPI extends BaseFetch {
     constructor(
@@ -77,7 +77,7 @@ export class OpenseaAPI extends BaseFetch {
                 token_ids,
                 asset_contract_address,
                 limit: queryParams.limit || 10,
-                side: queryParams.side || OrderType.Buy,
+                side: queryParams.side || OrderSide.Buy,
                 order_by: queryParams.order_by || 'created_date'
             }
             const json = await this.get(`${ORDERS_PATH}/orders`, query, {

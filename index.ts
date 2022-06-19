@@ -6,6 +6,6 @@ export type {
     FeesInfo,
     OrderJSON
 } from './src/types'
-export {OrderType} from './src/types'
+export {OrderSide} from './src/types'
 export {OpenSeaSDK} from './src/index'
 export {SwapEx} from './src/swapEx/swapEx'

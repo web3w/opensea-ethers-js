@@ -18,7 +18,7 @@ import {
     NULL_ADDRESS, INVERSE_BASIS_POINT
 } from './constants'
 import {makeBigNumber, toBaseUnitAmount} from './helper'
-import {OfferType, OrderType, MetaAsset} from "web3-accounts";
+import {OfferType, OrderSide, MetaAsset} from "web3-accounts";
 
 
 /**
@@ -73,7 +73,7 @@ export function getSchemaAndAsset(asset: Asset, quantity: number) {
 }
 
 export function getPriceParameters(
-    orderSide: OrderType,
+    orderSide: OrderSide,
     paymentTokenObj: Token,
     expirationTime: number,
     startAmount: number,
@@ -222,7 +222,7 @@ export async function _makeBuyOrder({
     // const {target, dataToCall, replacementPattern} = encodeBuy(metadata, accountAddress, offerType)
 
     const {basePrice, extra, paymentToken} = getPriceParameters(
-        OrderType.Buy,
+        OrderSide.Buy,
         paymentTokenObj,
         expirationTime,
         startAmount
@@ -277,7 +277,7 @@ export async function _makeBuyOrder({
         waitingForBestCounterOrder: false,
         feeMethod,
         feeRecipient,
-        side: OrderType.Buy,
+        side: OrderSide.Buy,
         saleKind: SaleKind.FixedPrice,
         target: "",
         howToCall: HowToCall.Call,
@@ -340,7 +340,7 @@ export async function _makeSellOrder({
         endAmount !== undefined && endAmount !== startAmount ? SaleKind.DutchAuction : SaleKind.FixedPrice
 
     const {basePrice, extra, paymentToken, reservePrice} = getPriceParameters(
-        OrderType.Sell,
+        OrderSide.Sell,
         paymentTokenObj,
         expirationTime,
         startAmount,
@@ -394,7 +394,7 @@ export async function _makeSellOrder({
         englishAuctionReservePrice: reservePrice ? makeBigNumber(reservePrice) : undefined,
         feeMethod,
         feeRecipient,
-        side: OrderType.Sell,
+        side: OrderSide.Sell,
         saleKind: orderSaleKind,
         target: "",
         howToCall: HowToCall.Call,
@@ -526,7 +526,7 @@ export function _makeMatchingOrder({
  * @param matchingOrder The result of _makeMatchingOrder
  */
 export function assignOrdersToSides(order: Order, matchingOrder: UnsignedOrder): { buy: Order; sell: Order } {
-    const isSellOrder = order.side == OrderType.Sell
+    const isSellOrder = order.side == OrderSide.Sell
 
     let buy: Order
     let sell: Order

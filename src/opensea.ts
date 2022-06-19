@@ -9,7 +9,7 @@ import {
     Web3Accounts,
     Token,
     APIConfig,
-    OrderType,
+    OrderSide,
     Asset,
     BuyOrderParams,
     CreateOrderParams,
@@ -145,7 +145,7 @@ export class OpenSea extends EventEmitter {
         return this.userAccount.getAssetApprove(asset, accountProxy, maker)
     }
 
-    async getOrderApproveStep(params: CreateOrderParams, side: OrderType) {
+    async getOrderApproveStep(params: CreateOrderParams, side: OrderSide) {
         try {
             const {asset, paymentToken, startAmount, quantity} = params
             const tokenAddr = paymentToken ? paymentToken.address : NULL_ADDRESS
@@ -153,7 +153,7 @@ export class OpenSea extends EventEmitter {
             let accountRegister, assetApprove, tokenApprove
 
             // 检查 Sell 买单
-            if (side == OrderType.Sell) {
+            if (side == OrderSide.Sell) {
                 const {accountProxy} = await this.getAccountProxy()
                 // const registerCallData =
                 accountRegister = {
@@ -289,7 +289,7 @@ export class OpenSea extends EventEmitter {
                                      buyerAddress
                                  }: SellOrderParams): Promise<any> {
         const params = {asset, quantity, paymentToken, startAmount, expirationTime} as CreateOrderParams
-        const {accountRegister, assetApprove, tokenApprove} = await this.getOrderApproveStep(params, OrderType.Sell)
+        const {accountRegister, assetApprove, tokenApprove} = await this.getOrderApproveStep(params, OrderSide.Sell)
         if (!accountRegister.isApprove) {
             const tx = await ethSend(this.walletInfo, accountRegister.calldata)
             await tx.wait()
@@ -357,7 +357,7 @@ export class OpenSea extends EventEmitter {
         const accountAddress = this.walletInfo.address
 
         const params = {asset, quantity, paymentToken, startAmount, expirationTime} as CreateOrderParams
-        const {tokenApprove} = await this.getOrderApproveStep(params, OrderType.Buy)
+        const {tokenApprove} = await this.getOrderApproveStep(params, OrderSide.Buy)
 
         if (!tokenApprove.isApprove) {
             const tx = await ethSend(this.walletInfo, tokenApprove.calldata)
@@ -461,7 +461,7 @@ export class OpenSea extends EventEmitter {
             const isCancelled = await this.exchange.cancelledOrFinalized(orderHash)
             if (isCancelled) {
                 let side = 'sell'
-                if (orderJson.side === OrderType.Buy) {
+                if (orderJson.side === OrderSide.Buy) {
                     side = 'buy'
                 }
                 console.log('cancelledOrFinalized', validParams)
@@ -475,7 +475,7 @@ export class OpenSea extends EventEmitter {
             // return false
         }
 
-        if (orderJson.side === OrderType.Sell) {
+        if (orderJson.side === OrderSide.Sell) {
             const maker = orderJson.maker
             // 检查资产授权  // 检查资产余额
             const asset = metadataToAsset(orderJson.metadata)
@@ -496,7 +496,7 @@ export class OpenSea extends EventEmitter {
             }
         }
 
-        if (orderJson.side === OrderType.Buy) {
+        if (orderJson.side === OrderSide.Buy) {
             const maker = orderJson.maker
             if (orderJson.paymentToken == NULL_ADDRESS) throw 'Buy order payment token can\'t be ETH'
             const {allowance, balances} = await this.getTokenProxyApprove(orderJson.paymentToken, maker)
@@ -526,13 +526,13 @@ export class OpenSea extends EventEmitter {
         if (order.metadata.schema.toLowerCase() == 'erc721') {
             // const gas = await this.contracts.merkleValidator.estimateGas.matchERC721UsingCriteria(from, to, token, tokenId, root, proof)
 
-            if (order.side == OrderType.Sell) {
+            if (order.side == OrderSide.Sell) {
                 const callData = await this.merkleValidator.populateTransaction.matchERC721UsingCriteria(from, NULL_ADDRESS, token, tokenId, root, proof)
                 dataToCall = callData.data || ""
                 replacementPattern = '0x000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
             }
 
-            if (order.side == OrderType.Buy) {
+            if (order.side == OrderSide.Buy) {
                 const callData = await this.merkleValidator.populateTransaction.matchERC721UsingCriteria(NULL_ADDRESS, assetRecipientAddress, token, tokenId, root, proof)
                 dataToCall = callData.data || ""
                 replacementPattern = '0x00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
@@ -541,12 +541,12 @@ export class OpenSea extends EventEmitter {
 
         if (order.metadata.schema.toLowerCase() == 'erc1155') {
 
-            if (order.side == OrderType.Sell) {
+            if (order.side == OrderSide.Sell) {
                 const callData = await this.merkleValidator.populateTransaction.matchERC1155UsingCriteria(from, NULL_ADDRESS, token, tokenId, amount, root, proof)
                 dataToCall = callData.data || ""
                 replacementPattern = '0x000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
             }
-            if (order.side == OrderType.Buy) {
+            if (order.side == OrderSide.Buy) {
                 //
                 const callData = await this.merkleValidator.populateTransaction.matchERC1155UsingCriteria(NULL_ADDRESS, assetRecipientAddress, token, tokenId, amount, root, proof)
                 dataToCall = callData.data || ""

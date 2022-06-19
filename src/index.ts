@@ -9,7 +9,7 @@ import {
     LowerPriceOrderParams,
     MatchParams,
     metadataToAsset,
-    OrderType,
+    OrderSide,
     SellOrderParams
 } from "web3-accounts"
 
@@ -81,7 +81,7 @@ export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
         return assetApprove
     }
 
-    async getOrderApproveStep(params: CreateOrderParams, side: OrderType) {
+    async getOrderApproveStep(params: CreateOrderParams, side: OrderSide) {
         return this.contracts.getOrderApproveStep(params, side)
     }
 

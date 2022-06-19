@@ -2,9 +2,10 @@ import {
     Asset,
     Token,
     OfferType,
-    OrderType,
+    OrderSide,
     ExchangeMetadata,
-    APIConfig
+    APIConfig,
+    BaseFetch
 } from "web3-accounts"
 import {BigNumber, ECSignature} from 'web3-wallets'
 
@@ -18,12 +19,13 @@ export {
     getChainRpcUrl,
     hexUtils,
     getEIP712DomainHash,
-    createEIP712TypedData
+    createEIP712TypedData,
+    sleep
 } from 'web3-wallets'
 export type {Signature, WalletInfo, LimitedCallSpec, EIP712TypedData, EIP712Domain} from 'web3-wallets'
 
 
-export {OrderType}
+export {OrderSide,BaseFetch}
 export type {Asset, Token, APIConfig, ExchangeMetadata, ECSignature}
 
 export interface OrdersQueryParams {
@@ -88,7 +90,7 @@ export enum HowToCall {
 
 export interface UnhashedOrder extends BaseOrder {
     feeMethod: FeeMethod
-    side: OrderType
+    side: OrderSide
     saleKind: SaleKind
     howToCall: HowToCall
     quantity: BigNumber

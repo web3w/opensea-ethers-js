@@ -72,7 +72,7 @@ const Test_API_CONFIG = {
                     token_ids: sellAsset.tokenId
                 }],
                 include_orders: true,
-            } as AssetsQueryParams
+            }
             const order = await sellEx.api.getAssets(assetsQuery)
 
             console.log(order)
