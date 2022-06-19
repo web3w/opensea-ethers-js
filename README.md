@@ -155,12 +155,16 @@ declines until `expirationTime` is hit:
 // Expire this auction one day from now.
 // Note that we convert from the JavaScript timestamp (milliseconds):
 const expirationTime = Math.round(Date.now() / 1000 + 60 * 60 * 24)
-
+ 
 const listing = await seaport.createSellOrder({
     asset: {
         tokenId,
         tokenAddress,
-        schemaName
+        schemaName,
+        "collection": {
+            royaltyFeeAddress,
+            royaltyFeePoints
+        }
     },
     startAmount: 3,
     // If `endAmount` is specified, the order will decline in value to that amount until `expirationTime`. Otherwise, it's a fixed-price order:
