@@ -1,7 +1,7 @@
 import {SellOrderParams} from "web3-accounts";
 
 import * as secrets from '../../secrets.json'
-import {Seaport} from "../../src/openseaEx/openseaExAgent";
+import {OpenSeaSDK} from "../src/index";
 import {AssetsQueryParams} from "../src/types";
 
 
@@ -12,12 +12,12 @@ const API_CONFIG = {
         1: {
             proxyUrl: 'http://127.0.0.1:7890',
             apiTimeout: 10200,
-            protocolFeePoint: 250
+            protocolFeePoints: 250
         },
         4: {
             proxyUrl: 'http://127.0.0.1:7890',
             apiTimeout: 10200,
-            protocolFeePoint: 250
+            protocolFeePoints: 250
         }
     }
 
@@ -26,7 +26,7 @@ const API_CONFIG = {
 
             const chainId = 4
             const config = API_CONFIG[chainId]
-            const sdk = new Seaport({
+            const sdk = new OpenSeaSDK({
                 chainId,
                 address: seller,
                 privateKeys: secrets.privateKeys
@@ -38,9 +38,10 @@ const API_CONFIG = {
                 schemaName: ownerAsset.schema_name,
                 collection: {
                     royaltyFeeAddress: ownerAsset.royaltyFeeAddress,
-                    royaltyFeePoint: ownerAsset.royaltyFeePoint
+                    royaltyFeePoints: ownerAsset.royaltyFeePoints
                 }
             }
+            console.log(asset)
             if (!asset) throw "error"
             const sellParams = {
                 asset,

@@ -5,7 +5,7 @@ import {
     OrderSide,
     ExchangeMetadata,
     APIConfig,
-    BaseFetch
+    BaseFetch, FeesInfo
 } from "web3-accounts"
 import {BigNumber, ECSignature} from 'web3-wallets'
 
@@ -25,8 +25,8 @@ export {
 export type {Signature, WalletInfo, LimitedCallSpec, EIP712TypedData, EIP712Domain} from 'web3-wallets'
 
 
-export {OrderSide,BaseFetch}
-export type {Asset, Token, APIConfig, ExchangeMetadata, ECSignature}
+export {OrderSide, BaseFetch}
+export type {Asset, Token, APIConfig, ExchangeMetadata, ECSignature, FeesInfo}
 
 export interface OrdersQueryParams {
     token_ids: string[]
@@ -50,13 +50,6 @@ export interface AssetsQueryParams {
     owner?: string
     limit?: number
     include_orders?: boolean
-}
-
-export interface FeesInfo {
-    royaltyFeeAddress: string
-    royaltyFeePoint: number
-    protocolFeePoint?: number
-    protocolFeeAddress?: string
 }
 
 export interface AssetCollection extends FeesInfo {

@@ -74,7 +74,7 @@ const buySDK = new OpenSeaSDK({
             // const lowParams = {
             //     orderStr: sellOrderStr,
             //     basePrice: new BigNumber(0.001).times(new BigNumber(10).pow(18)).toString(),
-            //     royaltyFeePoint: 200,
+            //     royaltyFeePoints: 200,
             //     royaltyFeeAddress: "0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401",
             //     standard
             // } as LowerPriceOrderParams

@@ -1,13 +1,14 @@
 import * as secrets from '../../secrets.json'
 import {ETHToken, SellOrderParams} from "web3-accounts";
-import {Seaport} from "../../src/openseaEx/openseaExAgent";
+import {OpenSea} from "../src/opensea";
+import {OpenSeaSDK} from "../src/index";
 
 const buyer = '0x9F7A946d935c8Efc7A8329C0d894A69bA241345A'
 const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 
 
 ;(async () => {
-        const buyEx = new Seaport({
+        const buyEx = new OpenSeaSDK({
             chainId: 4,
             address: buyer,
             privateKeys: secrets.privateKeys
@@ -19,8 +20,8 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
                     "tokenAddress": "0xb556f251eacbec4badbcddc4a146906f2c095bee",
                     "schemaName": "ERC721",
                     "collection": {
-                        "transferFeeAddress": "0x0a56b3317ed60dc4e1027a63ffbe9df6fb102401",
-                        "elementSellerFeeBasisPoints": 200
+                        "royaltyFeeAddress": "0x0a56b3317ed60dc4e1027a63ffbe9df6fb102401",
+                        "royaltyFeePoints": 200
                     }
                 },
                 "startAmount": 0.02

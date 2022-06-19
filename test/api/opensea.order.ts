@@ -13,12 +13,12 @@ const Test_API_CONFIG = {
         1: {
             proxyUrl: 'http://127.0.0.1:7890',
             apiTimeout: 10200,
-            protocolFeePoint: 250
+            protocolFeePoints: 250
         },
         4: {
             proxyUrl: 'http://127.0.0.1:7890',
             apiTimeout: 10200,
-            protocolFeePoint: 250
+            protocolFeePoints: 250
         }
     }
 
@@ -26,7 +26,7 @@ const Test_API_CONFIG = {
         try {
 
             const chainId = 4
-            // const config = {proxyUrl: 'http://127.0.0.1:7890',protocolFeePoint:2}
+            // const config = {proxyUrl: 'http://127.0.0.1:7890',protocolFeePoints:2}
             const config = Test_API_CONFIG[chainId]
             const sellEx = new OpenSeaSDK({
                 chainId,

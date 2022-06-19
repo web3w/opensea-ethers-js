@@ -1,10 +1,11 @@
 {
   "name": "opensea-ethers-js",
-  "version": "1.2.1",
-  "description": "Javascript SDK for the OpenSea Market ",
+  "version": "1.2.2",
+  "description": "Javascript SDK for the OpenSea Market",
   "main": "lib/index.js",
   "type": "lib/index.d.ts",
   "author": "Element Project Developers",
+  "git": "https://github.com/cryptotx/opensea-ethers-js",
   "scripts": {
     "release": "tsc && npm publish",
     "dev:tsc": "tsc -w -p tsconfig.json",
@@ -24,7 +25,7 @@
     "net": "^1.0.2",
     "query-string": "^7.1.1",
     "tls": "^0.0.1",
-    "web3-accounts": "1.1.32",
+    "web3-accounts": "1.1.33",
     "web3-wallets": "^2.0.19"
   },
   "devDependencies": {

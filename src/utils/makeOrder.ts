@@ -186,7 +186,7 @@ export function getTimeParameters(
 
 export async function _makeBuyOrder({
                                         exchangeAddr,
-                                        protocolFeePoint,
+                                        protocolFeePoints,
                                         asset,
                                         quantity,
                                         accountAddress,
@@ -199,7 +199,7 @@ export async function _makeBuyOrder({
                                         offerType
                                     }: {
     exchangeAddr: string
-    protocolFeePoint: number
+    protocolFeePoints: number
     asset: Asset
     quantity: number
     accountAddress: string
@@ -231,10 +231,10 @@ export async function _makeBuyOrder({
 
     // -------- Fee -----------
 
-    let totalSellerFeeBasisPoints = protocolFeePoint
+    let totalSellerFeeBasisPoints = protocolFeePoints
 
-    if (asset.collection.royaltyFeePoint) {
-        totalSellerFeeBasisPoints = Number(protocolFeePoint) + Number(asset.collection.royaltyFeePoint)
+    if (asset?.collection?.royaltyFeePoints) {
+        totalSellerFeeBasisPoints = Number(protocolFeePoints) + Number(asset.collection.royaltyFeePoints)
     }
     _validateFees(0, totalSellerFeeBasisPoints)
     // OrderSide.Buy
@@ -298,7 +298,7 @@ export async function _makeBuyOrder({
 
 export async function _makeSellOrder({
                                          exchangeAddr,
-                                         protocolFeePoint,
+                                         protocolFeePoints,
                                          asset,
                                          quantity,
                                          accountAddress,
@@ -314,7 +314,7 @@ export async function _makeSellOrder({
                                          buyerAddress
                                      }: {
     exchangeAddr: string
-    protocolFeePoint: number
+    protocolFeePoints: number
     asset: Asset
     quantity: number
     accountAddress: string
@@ -353,12 +353,12 @@ export async function _makeSellOrder({
     // -------- Fee -----------
     const isPrivate = buyerAddress != NULL_ADDRESS
 
-    let totalSellerFeeBasisPoints = protocolFeePoint
+    let totalSellerFeeBasisPoints = protocolFeePoints
 
     if (isPrivate) {
         totalSellerFeeBasisPoints = 0
-    } else if (asset.collection.royaltyFeePoint) {
-        totalSellerFeeBasisPoints = protocolFeePoint + asset.collection.royaltyFeePoint
+    } else if (asset?.collection?.royaltyFeePoints) {
+        totalSellerFeeBasisPoints = protocolFeePoints + asset.collection.royaltyFeePoints
     }
     _validateFees(0, totalSellerFeeBasisPoints)
 

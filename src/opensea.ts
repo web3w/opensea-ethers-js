@@ -46,7 +46,7 @@ import {assert, schemas} from "./assert/index";
 
 export class OpenSea extends EventEmitter {
     public walletInfo: WalletInfo
-    public protocolFeePoint = DEFAULT_SELLER_FEE_BASIS_POINTS
+    public protocolFeePoints = DEFAULT_SELLER_FEE_BASIS_POINTS
     // address
     public contractAddresses: any
     // public WETHAddr: string
@@ -67,8 +67,8 @@ export class OpenSea extends EventEmitter {
     constructor(wallet: WalletInfo, config?: APIConfig) {
         super()
         const contracts = config?.contractAddresses || OPENSEA_CONTRACTS_ADDRESSES[wallet.chainId]
-        if (config?.protocolFeePoint) {
-            this.protocolFeePoint = config.protocolFeePoint
+        if (config?.protocolFeePoints) {
+            this.protocolFeePoints = config.protocolFeePoints
         }
         this.walletInfo = wallet
         this.accountProxyAddress = NULL_ADDRESS
@@ -313,7 +313,7 @@ export class OpenSea extends EventEmitter {
         const accountAddress = this.walletInfo.address
         const sellOrderParams = {
             exchangeAddr,
-            protocolFeePoint: this.protocolFeePoint,
+            protocolFeePoints: this.protocolFeePoints,
             asset,
             quantity,
             accountAddress,
@@ -366,7 +366,7 @@ export class OpenSea extends EventEmitter {
         expirationTime = expirationTime ? parseInt(String(expirationTime)) : DEFAULT_LISTING_TIME + DEFAULT_EXPIRATION_TIME;
         const buyOrderParams = {
             exchangeAddr,
-            protocolFeePoint: this.protocolFeePoint,
+            protocolFeePoints: this.protocolFeePoints,
             asset,
             quantity,
             accountAddress,
@@ -610,7 +610,7 @@ export class OpenSea extends EventEmitter {
         }
     }
 
-    public async matchOrder(orderStr: string) {
+    public async fulfillOrder(orderStr: string) {
         await this.checkMatchOrder(orderStr)
         const {callData, sell} = await this.getMatchCallData({orderStr})
         console.assert(sell.exchange.toLowerCase() == this.exchange.address.toLowerCase(), 'AcceptOrder error')

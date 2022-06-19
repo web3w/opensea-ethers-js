@@ -98,11 +98,11 @@ export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
     }
 
     async matchOrder(orderStr: string) {
-        return this.contracts.matchOrder(orderStr)
+        return this.contracts.fulfillOrder(orderStr)
     }
 
     async fulfillOrder(orderStr: string) {
-        return this.contracts.matchOrder(orderStr)
+        return this.contracts.fulfillOrder(orderStr)
     }
 
     async cancelOrders(orders: string[]) {
@@ -145,8 +145,8 @@ export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
         const assets: AssetCollection[] = await this.api.getAssets(tokens)
         return assets.map(val => (<FeesInfo>{
             royaltyFeeAddress: val.royaltyFeeAddress,
-            royaltyFeePoint: val.royaltyFeePoint,
-            protocolFeePoint: val.protocolFeePoint,
+            royaltyFeePoints: val.royaltyFeePoints,
+            protocolFeePoints: val.protocolFeePoints,
             protocolFeeAddress: this.contracts.feeRecipientAddress
         }))
     }

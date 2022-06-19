@@ -57,8 +57,8 @@ export class OpenseaAPI extends BaseFetch {
             // json.assets.asset_contract.dev_seller_fee_basis_points
             return json.assets.map(val => ({
                 ...val.asset_contract,
-                royaltyFeePoint: Number(val.collection?.dev_seller_fee_basis_points),
-                protocolFeePoint: Number(val.collection?.opensea_seller_fee_basis_points),
+                royaltyFeePoints: Number(val.collection?.dev_seller_fee_basis_points),
+                protocolFeePoints: Number(val.collection?.opensea_seller_fee_basis_points),
                 royaltyFeeAddress: val.collection?.payout_address,
                 sell_orders: val.sell_orders,
                 token_id: val.token_id

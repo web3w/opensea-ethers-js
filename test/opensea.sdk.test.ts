@@ -17,7 +17,7 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
                 chainId,
                 address: seller,
                 privateKeys: secrets.privateKeys
-            },)
+            },{protocolFeePoints:100})
 
             const buyerSdk = new OpenSeaSDK({
                 chainId,
@@ -64,7 +64,6 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
             const {callData, params, sell, buy} = await buyerSdk.getMatchCallData({
                 orderStr,
             })
-            //https://rinkeby.etherscan.io/tx/0x290a6ae032856189e148b0d352ab76b45c2f07bbf2db4f32ed65c21e2798c5a6
             const gas = await buyerSdk.contracts.estimateGas(callData).catch(async (err: any) => {
                 console.log(err)
             })
