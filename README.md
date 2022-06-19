@@ -186,7 +186,7 @@ Parameters passed into API filter objects are underscored instead of camel-cased
 main [OpenSea API parameters](https://docs.opensea.io/v1.0/reference):
 
 ```JavaScript
-import {OrderType} from 'opensea-ethers-js'
+import {OrderSide} from 'opensea-ethers-js'
 
 // Get offers (bids), a.k.a. orders where `side == 0` 
 const query = {
@@ -199,7 +199,7 @@ const {orders, count} = await seaport.api.getOrders(query)
 const {orders, count} = await seaport.api.getOrders({
     asset_contract_address: tokenAddress,
     token_ids: [tokenId],
-    side: OrderType.Sell
+    side: OrderSide.Sell
 }, 2)
 ```
 
@@ -221,7 +221,7 @@ up-to-date and detailed explanantions.
  */
  maker ? : string, // Address of the order's creator
  taker ? : string, // The null address if anyone is allowed to take the order
- side ? : OrderType, // 0 for offers, 1 for auctions
+ side ? : OrderSide, // 0 for offers, 1 for auctions
  owner ? : string, // Address of owner of the order's asset 
  asset_contract_address ? : string, // Contract address for order's asset 
  token_ids ? : Array < number | string >
@@ -236,7 +236,7 @@ up-to-date and detailed explanantions.
 To buy an item , you need to **fulfill a sell order**. To do that, it's just one call:
 
 ```JavaScript
-const orders = await seaport.api.getOrders({side: OrderType.Sell, ...})
+const orders = await seaport.api.getOrders({side: OrderSide.Sell, ...})
 const tx = await seaport.fulfillOrder(JSON.stringify(orders[0]))
 console.log(tx.hash)
 await tx.wait()
@@ -255,7 +255,7 @@ Similar to fulfilling sell orders above, you need to fulfill a buy order on an i
 offer.
 
 ```JavaScript
-const orders = await seaport.api.getOrders({side: OrderType.Buy, ...})
+const orders = await seaport.api.getOrders({side: OrderSide.Buy, ...})
 const tx = await seaport.fulfillOrder(JSON.stringify(orders[0]))
 console.log(tx.hash)
 await tx.wait()

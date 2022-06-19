@@ -2,7 +2,6 @@ import {Button, Modal, Radio, Space, Table} from "antd";
 import React, {useContext, useEffect, useState} from "react";
 import {Context} from '../AppContext'
 import "./index.css"
-import {OrderType} from "web3-wallets";
 import {nftOrder} from './config'
 import {CreateOrderForm} from "./CreateOrderForm";
 
