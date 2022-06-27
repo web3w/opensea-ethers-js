@@ -51,7 +51,7 @@ const seller = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 
 
 
-            // const step = await eleEx.getOrderApproveStep(sellParams, OrderSide.Sell)
+            // const step = await eleEx.getOrderApprove(sellParams, OrderSide.Sell)
             // console.log(step)
             const sellData = await sellEx.createSellOrder(sellParams)
             const orderStr = JSON.stringify(sellData)

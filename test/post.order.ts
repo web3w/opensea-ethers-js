@@ -11,12 +11,12 @@ const buyer = '0x0A56b3317eD60dC4E1027A63ffbE9df6fb102401'
 const API_CONFIG = {
         1: {
             proxyUrl: 'http://127.0.0.1:7890',
-            apiTimeout: 10200,
+            apiTimeout: 20000,
             protocolFeePoints: 250
         },
         4: {
             proxyUrl: 'http://127.0.0.1:7890',
-            apiTimeout: 10200,
+            apiTimeout: 20200,
             protocolFeePoints: 250
         }
     }
@@ -49,9 +49,9 @@ const API_CONFIG = {
             } as SellOrderParams
 
             const buyData = await sdk.createBuyOrder(sellParams)
-            const cancelTx = await sdk.cancelOrders([JSON.stringify(buyData)])
-            await cancelTx.wait()
-            console.log("success cancelOrders", cancelTx.hash)
+            // const cancelTx = await sdk.cancelOrders([JSON.stringify(buyData)])
+            // await cancelTx.wait()
+            // console.log("success cancelOrders", cancelTx.hash)
 
             const buyOrder = await sdk.api.postOrder(JSON.stringify(buyData))
             console.log('Success offer', buyOrder.id)

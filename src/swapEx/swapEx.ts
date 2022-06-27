@@ -1,5 +1,4 @@
 import EventEmitter from 'events'
-import {Contract, ethers} from 'ethers'
 import {OpenSeaSDK} from '../index'
 import {
     EXSWAP_CONTRACTS_ADDRESSES,
@@ -8,7 +7,7 @@ import {
 
 
 import {
-    ethSend, LimitedCallSpec,
+    ethSend, LimitedCallSpec, Contract, ethers,
     WalletInfo, getEstimateGas, CHAIN_CONFIG, getChainRpcUrl, TokenSchemaNames
 } from 'web3-wallets'
 

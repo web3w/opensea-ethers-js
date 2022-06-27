@@ -20,13 +20,12 @@ import {
     NULL_ADDRESS,
     AssetsQueryParams,
     AssetCollection,
-    FeesInfo
+    FeesInfo, OrdersQueryParams, OrderJSON
 } from "./types"
 
 import {OpenSea} from "./opensea";
 import {OpenseaAPI} from "./api/opensea";
 import {Asset} from "web3-accounts/lib/src/types";
-import {detectWallets} from "web3-wallets";
 
 export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
     public contracts: OpenSea
@@ -81,8 +80,8 @@ export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
         return assetApprove
     }
 
-    async getOrderApproveStep(params: CreateOrderParams, side: OrderSide) {
-        return this.contracts.getOrderApproveStep(params, side)
+    async getOrderApprove(params: CreateOrderParams, side: OrderSide) {
+        return this.contracts.getOrderApprove(params, side)
     }
 
     async getMatchCallData(params: MatchParams): Promise<any> {
@@ -95,10 +94,6 @@ export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
 
     async createBuyOrder(params: BuyOrderParams): Promise<any> {
         return this.contracts.createBuyOrder(params)
-    }
-
-    async matchOrder(orderStr: string) {
-        return this.contracts.fulfillOrder(orderStr)
     }
 
     async fulfillOrder(orderStr: string) {
@@ -141,13 +136,25 @@ export class OpenSeaSDK extends EventEmitter implements ExchangetAgent {
         return this.api.getAssets(tokens)
     }
 
+    async getOwnerOrders(tokens?: OrdersQueryParams): Promise<{ orders: OrderJSON[], count: number }> {
+        if (tokens) {
+            tokens.owner = tokens.owner || this.walletInfo.address
+        } else {
+            tokens = {
+                owner: this.walletInfo.address,
+                limit: 10,
+            }
+        }
+        return this.api.getOrders(tokens)
+    }
+
     async getAssetsFees(tokens: AssetsQueryParams): Promise<FeesInfo[]> {
         const assets: AssetCollection[] = await this.api.getAssets(tokens)
         return assets.map(val => (<FeesInfo>{
             royaltyFeeAddress: val.royaltyFeeAddress,
             royaltyFeePoints: val.royaltyFeePoints,
             protocolFeePoints: val.protocolFeePoints,
-            protocolFeeAddress: this.contracts.feeRecipientAddress
+            protocolFeeAddress: this.contracts.protocolFeeAddress
         }))
     }
 

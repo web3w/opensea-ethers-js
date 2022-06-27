@@ -17,6 +17,7 @@ import {
     SellOrderParams,
     NullToken,
 } from 'web3-accounts'
+import {Contract, splitECSignature} from 'web3-wallets'
 import {
     Order, OrderJSON, UnhashedOrder,
     ethSend,
@@ -28,7 +29,6 @@ import {
     LimitedCallSpec,
     BigNumber
 } from "./types"
-import {Contract, ethers} from "ethers";
 
 import {
     _makeBuyOrder,
@@ -51,7 +51,7 @@ export class OpenSea extends EventEmitter {
     public contractAddresses: any
     // public WETHAddr: string
     public exchangeKeeper: string
-    public feeRecipientAddress: string
+    public protocolFeeAddress: string
     public tokenTransferProxyAddress: string
     public accountProxyAddress: string
 
@@ -94,7 +94,7 @@ export class OpenSea extends EventEmitter {
             address: contracts.GasToken,
             decimals: 18
         }
-        this.feeRecipientAddress = feeRecipientAddress
+        this.protocolFeeAddress = feeRecipientAddress
         this.tokenTransferProxyAddress = tokenTransferProxyAddr
         this.exchangeKeeper = contracts.ExchangeKeeper
 
@@ -102,10 +102,10 @@ export class OpenSea extends EventEmitter {
         this.userAccount = new Web3Accounts(wallet)
         const options = this.userAccount.signer
         if (exchangeAddr && proxyRegistryAddr) {
-            this.exchangeProxyRegistry = new ethers.Contract(proxyRegistryAddr, OpenseaABI.proxyRegistry.abi, options)
-            this.exchange = new ethers.Contract(exchangeAddr, OpenseaABI.openseaExV2.abi, options)
-            this.merkleValidator = new ethers.Contract(merkleProofAddr, OpenseaABI.merkleValidator.abi, options)
-            this.assetShared = new ethers.Contract(assetSharedAddress, OpenseaABI.assetContractShared.abi, options)
+            this.exchangeProxyRegistry = new Contract(proxyRegistryAddr, OpenseaABI.proxyRegistry.abi, options)
+            this.exchange = new Contract(exchangeAddr, OpenseaABI.openseaExV2.abi, options)
+            this.merkleValidator = new Contract(merkleProofAddr, OpenseaABI.merkleValidator.abi, options)
+            this.assetShared = new Contract(assetSharedAddress, OpenseaABI.assetContractShared.abi, options)
         } else {
             throw `${this.walletInfo.chainId} abi undefined`
         }
@@ -145,7 +145,7 @@ export class OpenSea extends EventEmitter {
         return this.userAccount.getAssetApprove(asset, accountProxy, maker)
     }
 
-    async getOrderApproveStep(params: CreateOrderParams, side: OrderSide) {
+    async getOrderApprove(params: CreateOrderParams, side: OrderSide): Promise<any> {
         try {
             const {asset, paymentToken, startAmount, quantity} = params
             const tokenAddr = paymentToken ? paymentToken.address : NULL_ADDRESS
@@ -200,7 +200,7 @@ export class OpenSea extends EventEmitter {
 
     async validateOrder_(order: UnhashedOrder, sigStr: string) {
         const {orderParm} = getWyvOrderParams(JSON.stringify(order))
-        const sig = ethers.utils.splitSignature(sigStr)
+        const sig = splitECSignature(sigStr)
         const isValidOrder = await this.exchange.validateOrder_(...orderParm, sig.v, sig.r, sig.s)
         if (!isValidOrder) {
             const validParams = await this.exchange.validateOrderParameters_(...orderParm)
@@ -289,7 +289,7 @@ export class OpenSea extends EventEmitter {
                                      buyerAddress
                                  }: SellOrderParams): Promise<any> {
         const params = {asset, quantity, paymentToken, startAmount, expirationTime} as CreateOrderParams
-        const {accountRegister, assetApprove, tokenApprove} = await this.getOrderApproveStep(params, OrderSide.Sell)
+        const {accountRegister, assetApprove, tokenApprove} = await this.getOrderApprove(params, OrderSide.Sell)
         if (!accountRegister.isApprove) {
             const tx = await ethSend(this.walletInfo, accountRegister.calldata)
             await tx.wait()
@@ -309,7 +309,7 @@ export class OpenSea extends EventEmitter {
         expirationTime = expirationTime ? parseInt(String(expirationTime)) : DEFAULT_LISTING_TIME + DEFAULT_EXPIRATION_TIME;
 
         const exchangeAddr = this.exchange.address
-        const feeRecipientAddr = this.feeRecipientAddress
+        const feeRecipientAddr = this.protocolFeeAddress
         const accountAddress = this.walletInfo.address
         const sellOrderParams = {
             exchangeAddr,
@@ -353,11 +353,11 @@ export class OpenSea extends EventEmitter {
         if (paymentToken.address == NULL_ADDRESS) 'Create buy order must be erc20 token'
 
         const exchangeAddr = this.exchange.address
-        const feeRecipientAddr = this.feeRecipientAddress
+        const feeRecipientAddr = this.protocolFeeAddress
         const accountAddress = this.walletInfo.address
 
         const params = {asset, quantity, paymentToken, startAmount, expirationTime} as CreateOrderParams
-        const {tokenApprove} = await this.getOrderApproveStep(params, OrderSide.Buy)
+        const {tokenApprove} = await this.getOrderApprove(params, OrderSide.Buy)
 
         if (!tokenApprove.isApprove) {
             const tx = await ethSend(this.walletInfo, tokenApprove.calldata)
@@ -409,7 +409,7 @@ export class OpenSea extends EventEmitter {
             // delete typedData.types.EIP712Domain;
             const sigStr = await (<any>this.userAccount.signer)._signTypedData(typedData.domain, typedData.types, typedData.message)
 
-            const signature = ethers.utils.splitSignature(sigStr)
+            const signature = splitECSignature(sigStr)
 
             const isValid = await this.validateOrder_(unHashOrder, sigStr)
             if (!isValid) {
@@ -644,7 +644,7 @@ export class OpenSea extends EventEmitter {
     }
 
     // cancel all order
-    private async incrementNonce() {
+    private async bulkCancelOrders() {
         const data = await this.exchange.populateTransaction.incrementNonce()
         const callData = {
             from: this.walletInfo.address,
@@ -658,7 +658,7 @@ export class OpenSea extends EventEmitter {
 
     public async cancelOrders(orders: string[]) {
         if (orders.length == 0) {
-            return this.incrementNonce()
+            return this.bulkCancelOrders()
         } else {
             return this.cancelOrder(orders[0])
         }

@@ -1,4 +1,4 @@
-import {Contract, ethers} from "ethers";
+import {Contract, ethers} from "web3-wallets";
 
 export type MintableToken = {
     creator: string,

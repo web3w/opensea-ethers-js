@@ -18,7 +18,8 @@ export class OpenseaAPI extends BaseFetch {
         config?: APIConfig
     ) {
         const chainId = config?.chainId || 1
-        const apiBaseUrl = config?.apiBaseUrl || OPENSEA_API_CONFIG[chainId].apiBaseUrl
+        const url = OPENSEA_API_CONFIG[chainId].apiBaseUrl || OPENSEA_API_CONFIG[1].apiBaseUrl
+        const apiBaseUrl = config?.apiBaseUrl || url
         super({
             apiBaseUrl,
             apiKey: config?.apiKey || OPENSEA_API_KEY
@@ -50,6 +51,7 @@ export class OpenseaAPI extends BaseFetch {
             : QueryString.stringify(query)
 
         try {
+            console.log(`${this.apiBaseUrl}/api/v1/assets?${queryUrl}`)
             //https://api-test.element.market/bridge/opensea/api/v1/assets?
             const json = await this.getQueryString('/api/v1/assets', queryUrl)
 
@@ -70,17 +72,14 @@ export class OpenseaAPI extends BaseFetch {
         }
     }
 
+    //https://docs.opensea.io/reference/retrieving-orders
     public async getOrders(queryParams: OrdersQueryParams, retries = 2): Promise<{ orders: OrderJSON[], count: number }> {
-        const {token_ids, asset_contract_address} = queryParams
+        const {token_ids, owner, limit, side, order_by, asset_contract_address} = queryParams
         try {
-            const query = {
-                token_ids,
-                asset_contract_address,
-                limit: queryParams.limit || 10,
-                side: queryParams.side || OrderSide.Buy,
-                order_by: queryParams.order_by || 'created_date'
-            }
-            const json = await this.get(`${ORDERS_PATH}/orders`, query, {
+            queryParams.limit = queryParams.limit || 10
+            queryParams.side = queryParams.side || OrderSide.Buy
+            queryParams.order_by = queryParams.order_by || 'created_date'
+            const json = await this.get(`${ORDERS_PATH}/orders`, queryParams, {
                 headers: {
                     "X-API-KEY": this.apiKey || OPENSEA_API_KEY
                 }

@@ -29,8 +29,8 @@ export {OrderSide, BaseFetch}
 export type {Asset, Token, APIConfig, ExchangeMetadata, ECSignature, FeesInfo}
 
 export interface OrdersQueryParams {
-    token_ids: string[]
-    asset_contract_address: string
+    token_ids?: string[]
+    asset_contract_address?: string
     payment_token_address?: string
     include_bundled?: boolean
     maker?: string
