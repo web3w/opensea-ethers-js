@@ -19,10 +19,8 @@ To get started, create a new OpenSeaJS client, called an OpenSeaPort 🚢, using
 ```JavaScript
 import {OpenSeaSDK} from 'opensea-ehters-js'
 
-const seaport = new OpenSeaSDK({
-    chainId: 4,
-    address: "0x9F7A946d935c8Efc7A8329C0d894A69bA241345A"
-})
+const {chainId, address} = new Web3Wallets({name:'metamask'})
+const seaport = new OpenSeaSDK({chainId, address})
 ```
 
 In the browser environment, only the chainId and address need to be configured，If you want to use the bash environment,
